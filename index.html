@@ -1377,11 +1377,15 @@
     }
 
     #g4FinaleMsg {
-      font-size: clamp(12px, 2.2vw, 18px);
+      font-size: clamp(11px, 2vw, 15px);
       font-weight: 400;
-      color: rgba(255, 200, 230, 0.78);
+      color: rgba(255, 210, 240, 0.88);
       text-align: center;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
+      line-height: 1.75;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 16px;
       animation: g4FinaleFadeIn 0.9s 0.85s ease both;
     }
 
@@ -1756,8 +1760,7 @@
       height: 54px;
       user-select: none;
       will-change: transform, opacity;
-      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .45));
-      will-change: transform
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .35));
     }
 
     .choc svg {
@@ -1783,7 +1786,7 @@
       height: auto;
       transform: translateX(-50%);
       pointer-events: none;
-      will-change: left, transform;
+      will-change: transform;
       filter: drop-shadow(0 5px 7px rgba(0, 0, 0, .45))
     }
 
@@ -1812,9 +1815,11 @@
       z-index: 14;
       width: 30px;
       height: 30px;
-      display: none;
+      display: block;           /* always in layout; toggled via opacity+visibility */
+      opacity: 0;
+      visibility: hidden;
       pointer-events: none;
-      will-change: transform;
+      will-change: transform, opacity;
       filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .5))
     }
 
@@ -2097,6 +2102,10 @@
       will-change: transform, opacity;
       filter: drop-shadow(0 0 10px rgba(255, 236, 170, .95)) drop-shadow(0 3px 5px rgba(0, 0, 0, .45)) saturate(1.35) brightness(1.14)
     }
+    /* Mobile: single lightweight glow — same look, no software multi-filter */
+    @media (max-width: 767px) {
+      .ingr { filter: drop-shadow(0 0 6px rgba(255, 225, 130, .60)) drop-shadow(0 2px 3px rgba(0,0,0,.28)); }
+    }
 
     .ingr::before {
       content: "";
@@ -2105,6 +2114,10 @@
       border-radius: 50%;
       z-index: -1;
       background: radial-gradient(circle, rgba(255, 248, 214, .92), rgba(255, 230, 150, .35) 55%, transparent 72%)
+    }
+    /* Mobile: skip the per-ingredient radial-gradient halo — too costly to repaint 60fps */
+    @media (max-width: 767px) {
+      .ingr::before { display: none; }
     }
 
     .ingr svg {
@@ -3455,7 +3468,15 @@
       <div id="g4Finale">
         <div id="g4FinaleText">HAPPY BIRTHDAY</div>
         <div id="g4FinaleYear">✨ 22 Years Young ✨</div>
-        <div id="g4FinaleMsg">Celebrating 22 Wonderful Years</div>
+        <div id="g4FinaleMsg">
+          May your smile stay as bright as today,<br>
+          your heart always be filled with love,<br>
+          and your dreams find their way to you.<br><br>
+          Wishing you endless happiness,<br>
+          laughter, good health,<br>
+          and all the love you deserve.<br><br>
+          Have the most wonderful birthday! ❤️
+        </div>
       </div>
     </div>
 
@@ -4471,22 +4492,28 @@ Now it's time for the part everyone has been waiting for.`
         }
       }, 480);
 
-      // 4) Floating hearts
+      // 4) Floating hearts — SVG_HEART image particles (same asset as Swiss/Level4 cannon)
       setTimeout(() => {
-        const W = window.innerWidth, H = window.innerHeight;
-        const HEARTS = ['❤️','💕','✨','💛','🌟','💖'];
-        for (let i = 0; i < 7; i++) {
+        let _g4HrtCtr = 0;
+        for (let i = 0; i < 8; i++) {
           setTimeout(() => {
-            const h = document.createElement('div');
-            h.style.cssText = 'position:fixed;z-index:60;pointer-events:none;' +
-              'font-size:' + (18 + Math.random()*16) + 'px;' +
-              'left:' + (8 + Math.random()*84) + '%;' +
-              'top:' + (25 + Math.random()*45) + '%;' +
-              'animation:g4HeartFloat 2.4s ease-out forwards;';
-            h.textContent = HEARTS[Math.floor(Math.random() * HEARTS.length)];
+            const uid = 'g4hrt' + (++_g4HrtCtr) + '_' + Date.now();
+            const sz  = 22 + Math.floor(Math.random() * 16);
+            const h   = document.createElement('div');
+            h.style.cssText =
+              'position:fixed;z-index:60;pointer-events:none;will-change:transform,opacity;' +
+              'width:' + sz + 'px;height:' + sz + 'px;' +
+              'left:' + (8 + Math.random() * 84) + '%;' +
+              'top:'  + (22 + Math.random() * 48) + '%;' +
+              'animation:fcHeartFloat 2.6s ease-out forwards;' +
+              'filter:drop-shadow(0 0 7px rgba(255,60,110,.85)) drop-shadow(0 0 2px rgba(255,160,190,.5));';
+            h.innerHTML = SVG_HEART
+              .replace(/id="hg"/g,    'id="' + uid + '"')
+              .replace(/url\(#hg\)/g, 'url(#' + uid + ')')
+              .replace('width="42" height="42"', 'width="' + sz + '" height="' + sz + '"');
             game4El.appendChild(h);
-            setTimeout(() => h.remove(), 2500);
-          }, i * 160);
+            setTimeout(() => { try { h.remove(); } catch(e){} }, 2700);
+          }, i * 170);
         }
       }, 680);
 
@@ -5329,7 +5356,7 @@ Now it's time for the part everyone has been waiting for.`
       g2BuildBackground();   // set switzerland.png background
       g2.choc = g2.hearts = g2.score = 0; updateG2HUD();
       g2.finish.classList.remove('show', 'btn-start');
-      g2.ball = null; g2.ballEl.style.display = 'none'; g2.charging = false; g2.isAimDragging = false; g2.power = 0; g2.chargeDir = 1;
+      g2.ball = null; g2.ballEl.style.opacity = '0'; g2.ballEl.style.visibility = 'hidden'; g2.charging = false; g2.isAimDragging = false; g2.power = 0; g2.chargeDir = 1;
       g2.cannonX = window.innerWidth / 2; g2.muzzleY = window.innerHeight - 190;
       moveCannon(g2.cannonX);
       layoutTargets();
@@ -5373,7 +5400,7 @@ Now it's time for the part everyone has been waiting for.`
       if (g2.ball) return;
       const v0 = 720 + power * 1550;                  // launch speed straight up
       g2.ball = { x: g2.cannonX, y: g2.muzzleY, vx: 0, vy: -v0 };
-      g2.ballEl.style.display = 'block'; positionBall();
+      g2.ballEl.style.opacity = '1'; g2.ballEl.style.visibility = 'visible'; positionBall();
       g2.cannon.classList.remove('recoil'); void g2.cannon.offsetWidth; g2.cannon.classList.add('recoil');
     }
     function positionBall() {
@@ -5399,7 +5426,7 @@ Now it's time for the part everyone has been waiting for.`
       }
       // cannonball physics
       if (g2.ball) {
-        const b = g2.ball, steps = 3, sdt = dt / steps;
+        const b = g2.ball, steps = MOBILE ? 2 : 3, sdt = dt / steps;   /* fewer substeps on mobile */
         for (let s = 0; s < steps && g2.ball; s++) {
           b.vy += G2_GRAV * sdt; b.x += b.vx * sdt; b.y += b.vy * sdt;
           let hit = -1;
@@ -5407,8 +5434,8 @@ Now it's time for the part everyone has been waiting for.`
             const tg = g2.targets[k], ddx = b.x - tg.curX, ddy = b.y - tg.y;
             if (ddx * ddx + ddy * ddy < (tg.r + 15) * (tg.r + 15)) { hit = k; break; }
           }
-          if (hit >= 0) { blastTarget(hit, b.x, b.y); g2.ball = null; g2.ballEl.style.display = 'none'; break; }
-          if (b.y > window.innerHeight + 60) { g2.ball = null; g2.ballEl.style.display = 'none'; break; }
+          if (hit >= 0) { blastTarget(hit, b.x, b.y); g2.ball = null; g2.ballEl.style.opacity = '0'; g2.ballEl.style.visibility = 'hidden'; break; }
+          if (b.y > window.innerHeight + 60) { g2.ball = null; g2.ballEl.style.opacity = '0'; g2.ballEl.style.visibility = 'hidden'; break; }
         }
         if (g2.ball) positionBall();
       }
@@ -5446,12 +5473,13 @@ Now it's time for the part everyone has been waiting for.`
           life: 1, lifeDecay: 0.015 + Math.random() * 0.01
         });
       }
+      const _bsz = MOBILE ? 80 : 120;
       const g = document.createElement('div');
-      g.style.cssText = `position:fixed;left:${x}px;top:${y}px;z-index:122;pointer-events:none;width:120px;height:120px;transform:translate(-50%,-50%)`;
-      g.innerHTML = html; const s = g.querySelector('svg'); if (s) { s.setAttribute('width', '120'); s.setAttribute('height', '120'); }
+      g.style.cssText = `position:fixed;left:${x}px;top:${y}px;z-index:122;pointer-events:none;width:${_bsz}px;height:${_bsz}px;transform:translate(-50%,-50%)`;
+      g.innerHTML = html; const s = g.querySelector('svg'); if (s) { s.setAttribute('width', String(_bsz)); s.setAttribute('height', String(_bsz)); }
       document.body.appendChild(g);
       g.animate([{ transform: 'translate(-50%,-50%) scale(.6)', opacity: 1 },
-      { transform: 'translate(-50%,-50%) scale(4.6) rotate(15deg)', opacity: 0 }],
+      { transform: `translate(-50%,-50%) scale(${MOBILE ? 3.2 : 4.6}) rotate(15deg)`, opacity: 0 }],
         { duration: 560, easing: 'cubic-bezier(.2,.7,.3,1)' }).onfinish = () => g.remove();
     }
     function updateG2HUD() {
@@ -5476,7 +5504,7 @@ Now it's time for the part everyone has been waiting for.`
       window.removeEventListener('pointermove', g2Move);
       window.removeEventListener('pointerup', g2Up);
       g2.targets.forEach(t => t.el.remove()); g2.targets = [];
-      g2.ball = null; g2.ballEl.style.display = 'none'; g2.charging = false;
+      g2.ball = null; g2.ballEl.style.opacity = '0'; g2.ballEl.style.visibility = 'hidden'; g2.charging = false;
       g2.powerEl.classList.remove('show');
       levelStats[1] = { choc: g2.choc, hearts: g2.hearts, score: g2.score };
       g2.el.classList.remove('show');
@@ -5518,7 +5546,7 @@ Now it's time for the part everyone has been waiting for.`
       cineBowl: document.getElementById('cineBowl'),
       flash: document.getElementById('g3flash'),
       win: document.getElementById('g3win'),
-      running: false, raf: 0, last: 0, lastSpawn: 0, spawnGap: 820, steamT: 0,
+      running: false, raf: 0, last: 0, lastSpawn: 0, spawnGap: MOBILE ? 1900 : 1450, steamT: 0,
       items: [], collected: {}, count: 0, score: 0, bowlX: 0, catchY: 0
     };
     function bowlSVG(broth) {
@@ -5613,7 +5641,9 @@ Now it's time for the part everyone has been waiting for.`
         g3.atmos.appendChild(l);
       });
     }
+    const G3_MAX_SAKURA = MOBILE ? 10 : 30;
     function spawnSakura() {
+      if (g3.atmos && g3.atmos.childElementCount >= G3_MAX_SAKURA) return;
       const W = window.innerWidth;
       const p = document.createElement('div'); p.className = 'sakura';
       const sx = Math.random() * W; p.style.left = sx + 'px'; p.style.top = '-20px';
@@ -5651,7 +5681,7 @@ Now it's time for the part everyone has been waiting for.`
     function openGame3() {
       g3.bg.style.backgroundImage = "url('ichiraku.png')";
       g3.collected = {}; g3.count = 0; g3.score = 0; g3.items = []; g3.field.innerHTML = '';
-      g3.lastSpawn = 0; g3.spawnGap = 820; g3.steamT = 0;
+      g3.lastSpawn = 0; g3.spawnGap = MOBILE ? 1900 : 1450; g3.steamT = 0;
       g3.cine.classList.remove('show'); g3.win.classList.remove('show');
       // Restore gameplay bowl in case player replays after a previous finale
       g3.bowl.style.transition  = '';
@@ -5706,7 +5736,12 @@ Now it's time for the part everyone has been waiting for.`
       if (e.key === 'ArrowLeft') moveBowl(g3.bowlX - 60);
       else if (e.key === 'ArrowRight') moveBowl(g3.bowlX + 60);
     }
+    const G3_MAX_INGR = MOBILE ? 3 : 6;   /* cap concurrent falling ingredients — keep screen clean */
     function spawnIngredient() {
+      if (g3.items.length >= G3_MAX_INGR) return;   /* limit active DOM elements */
+      /* Vertical spacing guard: don't spawn while an ingredient is still near the top */
+      const _topZone = window.innerHeight * 0.28;   /* tighter gap — only spawn when top 28% is clear */
+      if (g3.items.some(function(it) { return it.y < _topZone && it.y > -55; })) return;
       const missing = ING_KEYS.filter(k => !g3.collected[k]);
       let key;
       if (missing.length && Math.random() < 0.62) key = missing[(Math.random() * missing.length) | 0];
@@ -5719,7 +5754,7 @@ Now it's time for the part everyone has been waiting for.`
       // double the horizontal offset and misalign collision vs. visuals.
       g3.field.appendChild(el);
       const ingId = Date.now() + '_' + (Math.random() * 1e6 | 0);
-      g3.items.push({ el, id: ingId, type: key, key, x, y: -60, vy: 200 + Math.random() * 120, rot: Math.random() * 40 - 20, vr: Math.random() * 120 - 60 });
+      g3.items.push({ el, id: ingId, type: key, key, x, y: -60, vy: 275 + Math.random() * 155, rot: Math.random() * 40 - 20, vr: Math.random() * 140 - 70 });   /* fast fall → fewer simultaneous DOM nodes */
     }
     function updateGame3(now) {
       if (!g3.running) return;
@@ -5730,7 +5765,7 @@ Now it's time for the part everyone has been waiting for.`
       const steamRate = 0.45 - g3.count * 0.025;            // thicker steam as it cooks, but optimized (from 0.45s down to 0.225s)
       if (g3.steamT > steamRate) { g3.steamT = 0; steamPuff(g3.steam, 36 + Math.random() * 36, 0.5 + g3.count / 12); }
       // spawn
-      if (now - g3.lastSpawn > g3.spawnGap) { spawnIngredient(); g3.lastSpawn = now; g3.spawnGap = Math.max(560, g3.spawnGap - 5); }
+      if (now - g3.lastSpawn > g3.spawnGap) { spawnIngredient(); g3.lastSpawn = now; g3.spawnGap = Math.max(MOBILE ? 1350 : 1050, g3.spawnGap - 5); }
       const H = window.innerHeight;
       const catchRad = (g3.bowlW || 300) * 0.4; // dynamic collision width
       for (let k = g3.items.length - 1; k >= 0; k--) {
@@ -5846,7 +5881,7 @@ Now it's time for the part everyone has been waiting for.`
       g3.bowl.classList.remove('catch'); void g3.bowl.offsetWidth; g3.bowl.classList.add('catch');
       g3.bowl.classList.add('glow'); setTimeout(() => g3.bowl.classList.remove('glow'), 360);
       const bx = g3.bowlX, by = g3.catchY;
-      brothRipple(bx, by); brothRipple(bx, by + 6);
+      brothRipple(bx, by); if (!MOBILE) brothRipple(bx, by + 6);
       for (let i = 0; i < 5; i++) steamPuff(g3.steam, 38, 0.9 + g3.count / 9);
       itemBurst(bx, by - 10, '#ffe39a', 16, 95);
       brothSplash(bx, by);
@@ -6082,7 +6117,7 @@ Now it's time for the part everyone has been waiting for.`
     }
     function confettiBurst() {
       const cols = ['#ff5d7a', '#ffd23c', '#36c46a', '#2f9bff', '#9b6bff', '#ff9e57', '#ff85c0', '#80ffcc'];
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i < 15; i++) {
         const c = document.createElement('div'); c.className = 'confetti';
         c.style.background = cols[i % cols.length];
         c.style.left = Math.random() * 100 + '%'; c.style.top = '-30px';
@@ -6098,7 +6133,7 @@ Now it's time for the part everyone has been waiting for.`
       const p = worldToScreen(wx, wy);
       const cols = ['#ff5d7a', '#ffd23c', '#36c46a', '#2f9bff', '#9b6bff', '#ff9e57'];
       const spread = 130 * (camScale || 1), fall = 150 * (camScale || 1);
-      for (let i = 0; i < 60; i++) {
+      for (let i = 0; i < 22; i++) {
         const c = document.createElement('div'); c.className = 'confetti';
         c.style.position = 'fixed'; c.style.zIndex = 9;
         c.style.background = cols[i % cols.length];
