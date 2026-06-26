@@ -1215,10 +1215,11 @@
     /* The cake wrapper */
     #g4Cake {
       position: relative;
-      width: min(92vw, clamp(300px, 55vh, 520px));
+      width: min(96vw, clamp(340px, 62vh, 580px));
       height: auto;
       z-index: 5;
-      filter: drop-shadow(0 20px 40px rgba(255, 60, 180, .35));
+      filter: drop-shadow(0 20px 50px rgba(255, 60, 180, .45))
+              drop-shadow(0 0 30px rgba(255, 150, 230, .25));
       animation: g4CakeFloat 3.5s ease-in-out infinite alternate;
     }
 
@@ -1290,15 +1291,21 @@
       display: none;
     }
 
-    /* Tap hint pulse icon */
+    /* Tap hint text — warm instruction */
     #g4TapHint {
       position: absolute;
       bottom: clamp(18px, 4vh, 36px);
       left: 50%;
       transform: translateX(-50%);
-      font-size: clamp(28px, 5vw, 42px);
+      font-size: clamp(13px, 2.4vw, 17px);
+      font-weight: 500;
+      color: rgba(255, 220, 255, 0.88);
+      letter-spacing: 0.4px;
+      text-align: center;
+      white-space: nowrap;
+      text-shadow: 0 0 12px rgba(255,140,255,0.5);
       z-index: 12;
-      animation: g4TapPulse 1s ease-in-out infinite alternate;
+      animation: g4TapPulse 1.2s ease-in-out infinite alternate;
       pointer-events: none;
     }
 
@@ -1342,19 +1349,20 @@
     }
 
     #g4FinaleText {
-      font-size: clamp(34px, 8vw, 76px);
+      font-size: clamp(44px, 10vw, 96px);
       font-weight: 900;
       text-align: center;
-      background: linear-gradient(90deg, #ffd23c, #ff3388, #b060ff, #ffd23c);
-      background-size: 200% auto;
+      background: linear-gradient(90deg, #ffe066, #ff3388, #c080ff, #33ccff, #ffe066);
+      background-size: 300% auto;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      animation: shimmerTitle 2s linear infinite, g4FinaleFadeIn 0.9s ease both;
-      filter: drop-shadow(0 0 30px rgba(255, 200, 80, .8));
-      letter-spacing: 4px;
-      line-height: 1.15;
-      margin-bottom: 10px;
+      animation: shimmerTitle 1.8s linear infinite, g4FinaleFadeIn 0.9s ease both;
+      filter: drop-shadow(0 0 40px rgba(255, 200, 80, .9))
+              drop-shadow(0 0 80px rgba(255, 100, 200, .5));
+      letter-spacing: 5px;
+      line-height: 1.1;
+      margin-bottom: 12px;
     }
 
     #g4FinaleYear {
@@ -2799,18 +2807,17 @@
 #fcGojo       { left: 50%; top: 0; bottom: auto; transform: translateX(-50%); z-index: 10; }
 /* Rengoku: lower-left, anchored at bottom below DS              z-index 15 */
 #fcRengoku    { left: 0;   bottom: 0; z-index: 15; }
-/* Spirit Guide: centred, above dialogue                         z-index 16 */
-#fcSpirit     { left: 50%; bottom: 0%; transform: translateX(-50%); z-index: 16; }
-/* #fcSpirit     { left: 50%; bottom: 10%; transform: translateX(-50%); z-index: 16; } */
-/* Spirit Point: identical anchor to Spirit, for pointing pose   z-index 16 */
-#fcSpiritPoint{ left: 50%; bottom: 10%; transform: translateX(-50%); z-index: 16;
+/* Spirit Guide: centred, floats above the dialogue box          z-index 16 */
+#fcSpirit     { left: 50%; bottom: clamp(118px, 20vh, 172px); transform: translateX(-50%); z-index: 16; }
+/* Spirit Point: same anchor as Spirit                           z-index 16 */
+#fcSpiritPoint{ left: 50%; bottom: clamp(118px, 20vh, 172px); transform: translateX(-50%); z-index: 16;
                 position: absolute; pointer-events: none; opacity: 0; }
 
 /* ── Independent image sizing rules ─────────────────────────────────────── */
 #fcNaruto img {
   height: min(65vh, 500px);
   width: auto; max-width: 46vw;
-  object-fit: contain; display: block;
+  object-fit: contain; object-position: top left; display: block;
   filter: drop-shadow(0 8px 24px rgba(0,0,0,0.7));
   will-change: transform, opacity;
 }
@@ -2831,7 +2838,7 @@
 #fcGojo img {
   height: min(56vh, 430px);
   width: auto; max-width: 54vw;
-  object-fit: contain; display: block;
+  object-fit: contain; object-position: top center; display: block;
   filter: drop-shadow(0 8px 24px rgba(0,0,0,0.7));
   will-change: transform, opacity;
 }
@@ -2924,7 +2931,7 @@
 /* Floating hearts */
 .fc-heart {
   position: absolute;
-  font-size: clamp(18px,4vw,32px);
+  /* width/height set per-particle in JS */
   pointer-events: none;
   will-change: transform, opacity;
   animation: fcHeartFloat 2.4s ease-out forwards;
@@ -3125,7 +3132,7 @@
       <div class="msgcard">
         <div class="msgInner">
           <!-- Character Avatar -->
-          <div class="msgAvatarPanel">
+          <!-- <div class="msgAvatarPanel">
             <div class="msgAvatarIcon" id="spiritIconWrap">
               <svg viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="19" cy="19" r="18" fill="rgba(255,255,255,.1)" />
@@ -3136,7 +3143,7 @@
               </svg>
             </div>
             <div class="msgAvatarName">Spirit</div>
-          </div>
+          </div> -->
           <!-- Message Body -->
           <div class="msgBody">
             <div class="msgNameBadge">Spirit Guide</div>
@@ -3259,7 +3266,7 @@
     <div class="overlay" id="game4">
       <!-- Ambient sparkles injected by JS -->
       <div id="g4Title">✨ Make A Birthday Wish ✨</div>
-      <div id="g4Subtitle">Blow gently and send your wishes into the stars</div>
+      <div id="g4Subtitle">Every candle holds a wish — tap them gently and let your dreams shine a little brighter</div>
       <div id="g4ProgressWrap">
         <div id="g4ProgressFill"></div>
       </div>
@@ -3441,7 +3448,7 @@
         <div id="g4CandlesContainer" style="position:absolute;inset:0;z-index:6;"></div>
       </div>
       <div id="g4TapCount">Taps: 0 / 15</div>
-      <div id="g4TapHint">👆</div>
+      <div id="g4TapHint">Tap each candle to make a wish</div>
       <!-- Finale overlay -->
       <div id="g4Finale">
         <div id="g4FinaleText">HAPPY BIRTHDAY</div>
@@ -3745,70 +3752,133 @@
 </svg>`;
 
     /* ---------- LEVEL DATA ---------- */
-    const LEVELS = [
-      {
-        name: "Northern Light", x: 430, y: 1120, theme: "aurora", bg: "northernlight.png",
-        intro: `Hey! I'm Spirit!
+//     const LEVELS = [
+//       {
+//         name: "Northern Light", x: 430, y: 1120, theme: "aurora", bg: "northernlight.png",
+//         intro: `Hey! I'm Spirit!
 
-Welcome! I'm really happy you're here.
+// Welcome! I'm really happy you're here.
 
-I'll be your little companion in this little journey. We'll uncover wonderful moments, and enjoy every step along the way. I can't tell you everything just yet — after all, some surprises are best discovered together!
+// I'll be your little companion in this little journey. I can't tell you everything just yet — after all, some surprises are best discovered together!
 
-Just know that something special awaits at the end of our adventure.
+// So, what do you say?
 
-So, what do you say?
+// Shall we start our journey together?`,
+//         done: `Wonderful job!
 
-Shall we start our journey together?`,
-        done: `Wonderful job!
+// We did it! Our first chapter has been completed successfully, and I'm so happy we got to experience it together.
 
-We did it! Our first chapter has been completed successfully, and I'm so happy we got to experience it together.
+// There are still many exciting moments waiting for us ahead, and I can't wait to continue this adventure by your side.
 
-Every journey begins with a single step, and you've already taken yours beautifully. I'm really proud of you!
+// Shall we move forward?`},
 
-There are still many exciting moments waiting for us ahead, and I can't wait to continue this adventure by your side.
+//       {
+//         name: "Switzerland", x: 880, y: 760, theme: "swiss", bg: "swiss.png",
+//         intro: `Switzerland!
 
-Shall we move forward?`},
+// Look at these beautiful Alps — the air feels so fresh up here. Green valleys, little cabins, and snowy peaks all around us.
 
-      {
-        name: "Switzerland", x: 880, y: 760, theme: "swiss", bg: "swiss.png",
-        intro: `Switzerland!
+// Shall we explore this lovely place together?`,
+//         done: `Beautifully done!
 
-Look at these beautiful Alps — the air feels so fresh up here. Green valleys, little cabins, and snowy peaks all around us.
+// Another chapter complete! These mountains will surely miss us. You're doing so wonderfully.
 
-Shall we explore this lovely place together?`,
-        done: `Beautifully done!
+// Shall we move forward?`},
 
-Another chapter complete! These mountains will surely miss us. You're doing so wonderfully.
+//       {
+//         name: "Japan", x: 1340, y: 1080, theme: "japan", bg: "japan.png",
+//         intro: `Japan!
 
-Shall we move forward?`},
+// Cherry blossoms drifting everywhere, gentle lanterns, and Mount Fuji watching over us. Isn't it magical?
 
-      {
-        name: "Japan", x: 1340, y: 1080, theme: "japan", bg: "japan.png",
-        intro: `Japan!
+// Shall we wander through it together?`,
+//         done: `Wonderful!
 
-Cherry blossoms drifting everywhere, gentle lanterns, and Mount Fuji watching over us. Isn't it magical?
+// What a peaceful, beautiful chapter that was. I loved every moment with you.
 
-Shall we wander through it together?`,
-        done: `Wonderful!
+// Shall we move forward?`},
 
-What a peaceful, beautiful chapter that was. I loved every moment with you.
+//       {
+//         name: "Surprise", x: 1830, y: 640, theme: "surprise", bg: "surprise.png",
+//         intro: `A mysterious place...
 
-Shall we move forward?`},
+// I can feel something special hidden here — glowing trees, floating crystals, secrets waiting to be found. Are you curious?
 
-      {
-        name: "Surprise", x: 1830, y: 640, theme: "surprise", bg: "surprise.png",
-        intro: `A mysterious place...
+// Shall we discover it together?`,
+//         done: `Amazing!
 
-I can feel something special hidden here — glowing trees, floating crystals, secrets waiting to be found. Are you curious?
+// We uncovered the secrets of this place together. So close to the end now — and so proud of you.
 
-Shall we discover it together?`,
-        done: `Amazing!
+// Shall we move forward?`},
 
-We uncovered the secrets of this place together. So close to the end now — and so proud of you.
+//     ];
 
-Shall we move forward?`},
+const LEVELS = [
+  {
+    name: "Northern Light",
+    x: 430, y: 1120,
+    theme: "aurora",
+    bg: "northernlight.png",
+    intro: `Hey, birthday girl. I'm Spirit!.
 
-    ];
+I've been waiting for you.
+
+There are a few little moments I'd like to share with you today.
+
+Shall we begin?`,
+    done: `See?
+
+The journey always feels brighter when you're in it.
+
+Let's keep going.`
+  },
+
+  {
+    name: "Switzerland",
+    x: 880, y: 760,
+    theme: "swiss",
+    bg: "swiss.png",
+    intro: `A place as beautiful as this...
+
+Still has competition today.
+
+Ready to see why?`,
+    done: `Beautiful.
+
+Though somehow, you still manage to outshine the view.
+
+Let's continue.`
+  },
+
+  {
+    name: "Japan",
+    x: 1340, y: 1080,
+    theme: "japan",
+    bg: "japan.png",
+    intro: `Soft blossoms.
+Quiet skies.
+
+This place reminded me of someone.
+
+You.`,
+    done: `Every step with you feels a little special.
+
+Let's see what's next.`
+  },
+
+  {
+    name: "Surprise",
+    x: 1830, y: 640,
+    theme: "surprise",
+    bg: "surprise.png",
+    intro: `We're almost there.
+
+But I still have one more surprise waiting for you.`,
+    done: `Perfect.
+
+Now it's time for the part everyone has been waiting for.`
+  }
+];
     const charOffsetY = -95; // bigger avatar, sitting a bit lower on each level image
 
     /* ---------- THEMED SCENE SVGs ---------- */
@@ -4388,9 +4458,15 @@ Shall we move forward?`},
         cakeEl2.style.filter = 'drop-shadow(0 0 40px rgba(255,210,80,0.95)) drop-shadow(0 20px 60px rgba(255,100,0,0.7))';
       }
 
-      // 3) Show "HAPPY BIRTHDAY" text overlay
+      // 3) Show "HAPPY BIRTHDAY" text overlay + fade cake to background
       setTimeout(() => {
         document.getElementById('g4Finale').classList.add('show');
+        /* Cake fades to soft background — text + confetti are the heroes */
+        const cakeBack = document.getElementById('g4Cake');
+        if (cakeBack) {
+          cakeBack.style.transition = 'opacity 0.9s ease';
+          cakeBack.style.opacity    = '0.30';
+        }
       }, 480);
 
       // 4) Floating hearts
@@ -4412,9 +4488,11 @@ Shall we move forward?`},
         }
       }, 680);
 
-      // 5) Confetti + fireworks
+      // 5) Confetti (3 staggered bursts) + fireworks
       setTimeout(() => {
         try { confettiBurst(); } catch(e) {}
+        setTimeout(() => { try { confettiBurst(); } catch(e) {} }, 700);
+        setTimeout(() => { try { confettiBurst(); } catch(e) {} }, 1500);
         for (let i = 0; i < 7; i++) {
           setTimeout(() => {
             try {
@@ -6001,8 +6079,8 @@ Shall we move forward?`},
       }
     }
     function confettiBurst() {
-      const cols = ['#ff5d7a', '#ffd23c', '#36c46a', '#2f9bff', '#9b6bff', '#ff9e57'];
-      for (let i = 0; i < 90; i++) {
+      const cols = ['#ff5d7a', '#ffd23c', '#36c46a', '#2f9bff', '#9b6bff', '#ff9e57', '#ff85c0', '#80ffcc'];
+      for (let i = 0; i < 160; i++) {
         const c = document.createElement('div'); c.className = 'confetti';
         c.style.background = cols[i % cols.length];
         c.style.left = Math.random() * 100 + '%'; c.style.top = '-30px';
@@ -6485,7 +6563,11 @@ function fcTypewriter(el, text, speed) {
 async function fcLine(speaker, color, text) {
   /* Elevate speaker container so they pop forward while talking */
   var _spk = FC_SPK_MAP[speaker];
-  if (_spk) { _spk.els.forEach(function(el){ el.style.zIndex = String(FC_SPK_Z); }); }
+  if (_spk) { _spk.els.forEach(function(el){
+    el.style.zIndex     = String(FC_SPK_Z);
+    el.style.transition = 'filter 0.25s ease';
+    el.style.filter     = 'brightness(1.13)';
+  }); }
 
   fcDlgSpkr.textContent    = speaker;
   fcDlgSpkr.style.color    = color;
@@ -6497,8 +6579,11 @@ async function fcLine(speaker, color, text) {
   fcDlgTap.style.opacity   = '1';
   await fcWaitTap();
 
-  /* Reset speaker z-index back to base after tap */
-  if (_spk) { _spk.els.forEach(function(el){ el.style.zIndex = String(_spk.base); }); }
+  /* Reset speaker z-index and brightness after tap */
+  if (_spk) { _spk.els.forEach(function(el){
+    el.style.zIndex = String(_spk.base);
+    el.style.filter = '';
+  }); }
 }
 
 function fcHideDlg() {
@@ -6562,45 +6647,61 @@ function fcChoice(labelA, labelB) {
 /* ---- Character entry helpers (operate on container divs) ---- */
 function fcEnterNaruto(src) {
   fcImgNaruto.src           = src;
-  fcNaruto.style.opacity    = '1';
+  fcNaruto.style.opacity    = '0';
   fcNaruto.style.transform  = 'translateX(-110vw)';
-  fcNaruto.style.transition = 'transform 0.7s cubic-bezier(.2,1.3,.4,1)';
+  fcNaruto.style.transition = 'none';
   requestAnimationFrame(function(){ requestAnimationFrame(function(){
-    fcNaruto.style.transform = 'translateX(0)';
+    fcNaruto.style.transition = 'transform 0.75s cubic-bezier(.2,1.15,.4,1), opacity 0.45s ease';
+    fcNaruto.style.opacity    = '1';
+    fcNaruto.style.transform  = 'translateX(0)';
   }); });
 }
 
 function fcEnterOP(src) {
   fcImgOP.src               = src;
-  fcOP.style.opacity        = '1';
+  fcOP.style.opacity        = '0';
   fcOP.style.transform      = 'translateX(110vw)';
-  fcOP.style.transition     = 'transform 0.7s cubic-bezier(.2,1.3,.4,1)';
+  fcOP.style.transition     = 'none';
   requestAnimationFrame(function(){ requestAnimationFrame(function(){
-    fcOP.style.transform = 'translateX(0)';
+    fcOP.style.transition = 'transform 0.75s cubic-bezier(.2,1.15,.4,1), opacity 0.45s ease';
+    fcOP.style.opacity    = '1';
+    fcOP.style.transform  = 'translateX(0)';
   }); });
 }
 
 function fcEnterGojo(src) {
   fcImgGojo.src              = src;
-  fcGojoEl.style.opacity     = '1';
+  fcGojoEl.style.opacity     = '0';
   fcGojoEl.style.transform   = 'translateX(-50%) translateY(-110vh)';
-  fcGojoEl.style.transition  = 'transform 0.8s cubic-bezier(.2,1.3,.4,1)';
+  fcGojoEl.style.transition  = 'none';
   requestAnimationFrame(function(){ requestAnimationFrame(function(){
-    fcGojoEl.style.transform = 'translateX(-50%)';
+    fcGojoEl.style.transition  = 'transform 0.85s cubic-bezier(.2,1.15,.4,1), opacity 0.5s ease';
+    fcGojoEl.style.opacity     = '1';
+    fcGojoEl.style.transform   = 'translateX(-50%)';
   }); });
 }
 
 function fcEnterRengoku(src) {
   fcImgRengoku.src             = src;
-  fcRengokuEl.style.opacity    = '1';
+  fcRengokuEl.style.opacity    = '0';
   fcRengokuEl.style.transform  = 'translateX(-110vw)';
-  fcRengokuEl.style.transition = 'transform 0.7s cubic-bezier(.2,1.3,.4,1)';
+  fcRengokuEl.style.transition = 'none';
   requestAnimationFrame(function(){ requestAnimationFrame(function(){
-    fcRengokuEl.style.transform = 'translateX(0)';
+    fcRengokuEl.style.transition = 'transform 0.75s cubic-bezier(.2,1.15,.4,1), opacity 0.45s ease';
+    fcRengokuEl.style.opacity    = '1';
+    fcRengokuEl.style.transform  = 'translateX(0)';
   }); });
 }
 
 function fcEnterSpirit(src) {
+  /* Dynamically place Spirit above the dialogue box */
+  try {
+    var dlgRect = fcDlg.getBoundingClientRect();
+    var fcRect  = fc.getBoundingClientRect();
+    var aboveDlg = Math.max((fcRect.bottom - dlgRect.top) + 6, 118);
+    fcSpiritEl.style.bottom = aboveDlg + 'px';
+  } catch(e) { /* keep CSS fallback */ }
+
   fcImgSpirit.src              = src;
   fcSpiritEl.style.transform   = 'translateX(-50%) translateY(60px)';
   fcSpiritEl.style.opacity     = '0';
@@ -6624,7 +6725,7 @@ function fcSwapCharImg(imgEl, src) {
 function fcNarutoToStage() {
   /* Naruto is already at top:0 (CSS default) — just slide slightly left */
   fcNaruto.style.transition = 'transform 0.7s ease';
-  fcNaruto.style.transform  = 'translateX(-20%)';
+  fcNaruto.style.transform  = 'translateX(-15%)';
   return fcDelay(750);
 }
 
@@ -6672,17 +6773,34 @@ function fcCloseGame() {
 }
 
 /* ---- Effects helpers ---- */
+var _fcHrtCtr = 0;    /* unique id counter for SVG gradient refs */
 function fcFloatHearts(count, xPct, yPct) {
   count = count || 6;
+  /* SVG_HEART inline — same gradient heart as Level 1 & 2 cannon game.
+     Each particle gets a unique gradient id to avoid SVG id collisions. */
+  var sizes = [24, 28, 32, 20, 36];
   for (var i = 0; i < count; i++) {
-    var h = document.createElement('div');
-    h.className   = 'fc-heart';
-    h.textContent = ['❤️','💛','💜','🧡','💙'][Math.floor(Math.random()*5)];
-    h.style.left  = (xPct != null ? xPct : 20+Math.random()*60) + '%';
-    h.style.top   = (yPct != null ? yPct : 30+Math.random()*40) + '%';
-    h.style.animationDelay = (Math.random()*0.6) + 's';
-    fc.appendChild(h);
-    setTimeout(function(el){ return function(){ el.remove(); }; }(h), 2800);
+    (function(delay, idx) {
+      setTimeout(function() {
+        var uid = 'fch' + (++_fcHrtCtr);
+        var sz  = sizes[idx % sizes.length];
+        var h   = document.createElement('div');
+        h.className  = 'fc-heart';
+        h.style.width  = sz + 'px';
+        h.style.height = sz + 'px';
+        h.style.left   = (xPct != null ? xPct : 10 + Math.random() * 80) + '%';
+        h.style.top    = (yPct != null ? yPct : 20 + Math.random() * 55) + '%';
+        h.style.animationDelay = '0s';
+        h.style.filter = 'drop-shadow(0 0 7px rgba(255,60,110,.8)) drop-shadow(0 0 2px rgba(255,160,190,.5))';
+        /* Clone SVG_HEART with unique gradient id so colours render correctly */
+        h.innerHTML = SVG_HEART
+          .replace(/id="hg"/g,      'id="' + uid + '"')
+          .replace(/url\(#hg\)/g,   'url(#' + uid + ')')
+          .replace('width="42" height="42"', 'width="' + sz + '" height="' + sz + '"');
+        fc.appendChild(h);
+        setTimeout(function() { h.remove(); }, 2800);
+      }, delay);
+    })(i * 115, i);
   }
 }
 
@@ -6745,6 +6863,16 @@ async function fcPhase1_SpiritIntro() {
   var choice = await fcChoice('Proceed ✨', 'Close ✖');
   if (choice === 'b') { fcCloseGame(); return false; }
   fcHideDlg();
+
+  /* Spirit exits before Naruto arrives — slide down and fade out */
+  fcSpiritEl.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+  fcSpiritEl.style.opacity    = '0';
+  fcSpiritEl.style.transform  = 'translateX(-50%) translateY(50px)';
+  await fcDelay(600);
+  /* Clear spirit so it doesn't show through later scenes */
+  fcSpiritEl.style.transition = '';
+  fcImgSpirit.src             = '';
+
   return true;
 }
 
@@ -6773,7 +6901,8 @@ async function fcPhase3_SpiritShyIntro() {
   /* Cross-fade: greeting sprite (fcSpirit) → pointing sprite (fcSpiritPoint) */
   fcSpiritEl.style.transition = 'opacity 0.3s ease';
   fcSpiritEl.style.opacity    = '0';
-  fcImgSpiritPoint.src        = 'spirituppoint.png';
+  /* spirittapview.png specifically for the "someone is hiding" scene */
+  fcImgSpiritPoint.src        = 'spirittapview.png';
   fcSpiritPoint.style.transition = 'opacity 0.3s ease';
   fcSpiritPoint.style.opacity = '1';
   await fcDelay(400);
@@ -6800,11 +6929,21 @@ async function fcPhase4_DSReveal() {
   var peeks   = ['translateX(-75%)', 'translateX(-50%)', 'translateX(-25%)'];
   var tapMsgs = ['Come on, tap again! (2/3)', 'Almost there! (3/3)'];
 
+  /* Spirit pointer hover positions for each tap */
+  var spiritTapMoves = [
+    'translateX(-50%) translateY(-7px) rotate(4deg)',
+    'translateX(-47%) translateY(-4px) rotate(-3deg)',
+    'translateX(-53%) translateY(-10px) rotate(5deg)',
+  ];
+
   await new Promise(function(resolve) {
     fcSpecialTap = function() {
       taps++;
       fcDS.style.transition = 'transform 0.5s cubic-bezier(.2,1.3,.4,1)';
       fcDS.style.transform  = peeks[taps - 1];
+      /* Spirit reacts — gentle hover shift on each encouragement tap */
+      fcSpiritPoint.style.transition = 'transform 0.38s cubic-bezier(.2,1.2,.4,1)';
+      fcSpiritPoint.style.transform  = spiritTapMoves[taps - 1];
       var rect = fcImgDS.getBoundingClientRect();
       fcSparkle(rect.right - 15, rect.top + rect.height * 0.35, '#ff80a0', 8);
       if (taps >= 3) {
@@ -6818,6 +6957,11 @@ async function fcPhase4_DSReveal() {
   });
 
   await fcDelay(200);
+  /* Spirit pointer settles then fades out — her guidance work is done */
+  fcSpiritPoint.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+  fcSpiritPoint.style.transform  = 'translateX(-50%)';
+  fcSpiritPoint.style.opacity    = '0';
+  setTimeout(function() { fcImgSpiritPoint.src = ''; }, 500);
   fcDS.style.transition = 'transform 0.6s cubic-bezier(.2,1.3,.4,1)';
   fcDS.style.transform  = 'translateX(0)';
   await fcDelay(700);
@@ -6885,6 +7029,12 @@ async function fcPhase8_NarutoBreaks() {
     fcSwapCharImg(fcImgDS,  'demonslayerheart.png'),
     fcSwapCharImg(fcImgOP, 'onepieceheart-Photoroom.png'),
   ]);
+
+  /* Naruto's mood lifts — smooth fade to heart image before Gojo arrives */
+  await fcDelay(300);
+  await fcSwapCharImg(fcImgNaruto, 'narutoheart.png');
+  fcBounce(fcImgNaruto);
+  await fcLine('Naruto', FC_COL.naruto, "Heh... this is gonna be the best birthday ever, believe it!");
   fcHideDlg();
 }
 
@@ -6917,6 +7067,28 @@ async function fcPhase10_GojoArrival() {
   /* ── NEW: Gojo waving introduction ─────────────────────────────────────── */
   fcEnterGojo('gojowaving.png');
   await fcDelay(800);
+
+  /* ── Gojo blue aura: signature eye-energy reveal ──── */
+  fcImgGojo.style.transition = 'filter 0.5s ease';
+  fcImgGojo.style.filter     = 'drop-shadow(0 8px 24px rgba(0,0,0,0.8)) drop-shadow(0 0 28px #00c8ff) drop-shadow(0 0 70px #0060cc)';
+  /* Blue sparkle burst from Gojo's position */
+  for (var _bi = 0; _bi < 10; _bi++) {
+    (function(d) {
+      setTimeout(function() {
+        fcSparkle(
+          window.innerWidth * (0.3 + Math.random() * 0.4),
+          window.innerHeight * (0.03 + Math.random() * 0.35),
+          '#00c8ff', 7
+        );
+      }, d);
+    })(_bi * 80);
+  }
+
+  /* Spirit pointer fades out now that Gojo has fully arrived */
+  fcSpiritPoint.style.transition = 'opacity 0.6s ease';
+  fcSpiritPoint.style.opacity    = '0';
+  setTimeout(function() { fcImgSpiritPoint.src = ''; }, 700);
+
   fcBounce(fcImgGojo);
   await fcDelay(200);
 
@@ -6937,6 +7109,7 @@ async function fcPhase10_GojoArrival() {
   await fcLine('One Piece Crew', FC_COL.op, "Forget the guy in the sky...");
   await fcLine('One Piece Crew', FC_COL.op, "Have you seen how beautiful the birthday girl is?");
   await fcLine('One Piece Crew', FC_COL.op, "She's stealing everyone's attention!");
+  fcFloatHearts(5);   /* image hearts on OP beauty reaction */
 
   /* Restore DS position and image simultaneously */
   fcDS.style.transition = 'bottom 0.6s ease';
@@ -6970,7 +7143,7 @@ async function fcPhase11_NarutoFanboy() {
   fcHideDlg();
 }
 
-/* ---- Phase 12: Rengoku Arrival ---- */
+/* ---- Phase 12: Rengoku Arrival (4-step cinematic) ---- */
 async function fcPhase12_RengokuArrival() {
   fcBg('radial-gradient(ellipse at 20% 80%, #2a0a00 0%, #050010 100%)');
 
@@ -6983,39 +7156,51 @@ async function fcPhase12_RengokuArrival() {
   }
 
   await fcDelay(500);
-  /* Enter with rengokuheart.png — dramatic slide in from lower-left */
-  fcEnterRengoku('rengokuheart.png');
+
+  /* ── Step 1: Grand arrival — wave large ───────────────────────────────── */
+  fcEnterRengoku('rengokuwavelarge.png');
   await fcDelay(900);
 
-  /* Bounce + warm glow on entry */
   fcBounce(fcImgRengoku);
   fcImgRengoku.style.transition = 'filter 0.4s ease';
   fcImgRengoku.style.filter = 'drop-shadow(0 8px 24px rgba(0,0,0,0.7)) drop-shadow(0 0 30px #ff6030) drop-shadow(0 0 70px #ff8c00)';
 
   await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "SORRY I'M LATE! HAHAHAHA!");
-
   await fcLine('Naruto', FC_COL.naruto, "You almost missed the party!!");
 
-  await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "Never! Happy Birthday! Set your heart ablaze!!");
+  /* ── Step 2: Admiration — rengokuheartlarge ───────────────────────────── */
+  await fcSwapCharImg(fcImgRengoku, 'rengokuheartlarge.png');
+  fcFloatHearts(6);
+  await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "HOW COULD ANYONE NOT ADORE HER? SHE'S ABSOLUTELY WONDERFUL!");
+
+  /* ── Step 3: Lovestruck — rengokuhearthandlarge ───────────────────────── */
+  await fcSwapCharImg(fcImgRengoku, 'rengokuhearthandlarge.png');
+  fcFloatHearts(8);
+  await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "I THINK I'M MELTING... SHE'S TOO PRECIOUS!");
+
+  /* ── Step 4: Final mini cute state — rengokuheart ────────────────────── */
+  await fcSwapCharImg(fcImgRengoku, 'rengokuheart.png');
+  await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "...I HAVE OFFICIALLY TURNED INTO A KID.");
 
   await fcRengokuToStage();
   fcHideDlg();
 }
 
-/* ---- Phase 13: Heart Moment — centre Rengoku character heart ---- */
+/* ---- Phase 13: Heart Moment — Rengoku centre heart ---- */
 async function fcPhase13_RengokuHeart() {
   /* Rengoku character already shows rengokuheart.png (entered in Phase 12). */
   await fcDelay(400);
   await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "My heart burns bright with birthday wishes for you!");
-
-  await fcDelay(400);
-  await fcLine('Spirit Guide', FC_COL.spirit, "And mine too. Happy Birthday!");
   fcFloatHearts(8);
   fcHideDlg();
 }
 
 /* ---- Phase 14: Grand Group Photo ---- */
 async function fcPhase14_GroupPhoto() {
+  /* Rengoku is the bottom-centre hero — stays in place, rises above all other characters */
+  fcRengokuEl.style.zIndex = '9999';
+  fcGojoEl.style.zIndex    = '22';
+
   fcBg('radial-gradient(ellipse at center, #100020 0%, #020010 100%)');
 
   fcRainbow.classList.add('fc-on');
@@ -7118,10 +7303,13 @@ async function startFinalCelebration() {
 
   /* Reset all character containers */
   [fcNaruto, fcDS, fcOP, fcGojoEl, fcRengokuEl, fcSpiritEl, fcSpiritPoint].forEach(function(div) {
+    div.style.display    = '';   /* restore if hidden by display:none */
     div.style.opacity    = '0';
+    div.style.filter     = '';   /* restore speaker brightness */
     div.style.transition = '';
     div.style.bottom     = '';
     div.style.top        = '';
+    div.style.zIndex     = '';   /* restore CSS z-indices */
     div.style.transform  = '';
   });
   /* Restore centered elements' default transform after blanket reset */
