@@ -3703,7 +3703,7 @@
       <div id="g1stars"></div>
       <div id="g1head">
         <div class="g1chip" id="chipScore">0</div>
-        <div class="g1chip" id="chipHeart">0 / 1</div>
+        <div class="g1chip" id="chipHeart">0 / 5</div>
         <div class="g1chip" id="chipShoot">0 / 5</div>
         <div class="g1chip" id="chipStar">0</div>
         <div class="g1chip" id="chipCrys">0</div>
@@ -3747,10 +3747,10 @@
       <div id="g2head">
         <div class="g1chip" id="g2score">0</div>
         <div class="g1chip" id="g2choc">0 / 5</div>
-        <div class="g1chip" id="g2heart">0 / 2</div>
+        <div class="g1chip" id="g2heart">0 / 5</div>
       </div>
       <div id="g2goal">Move the cannon left/right &amp; hold to charge power — release to fire! Hit <b>5 chocolates</b>
-        and <b>2 hearts</b>.</div>
+        and <b>5 hearts</b>.</div>
       <div id="g2foot">
         <button class="btn btn-gold g-finish-btn" id="g2finish">FINISH CHAPTER</button>
       </div>
@@ -5093,12 +5093,12 @@ Now it's time for the part everyone has been waiting for.`
     const HOWTO = {
       0: {
         icon: HOWTO_ICONS[0], title: 'Northern Light',
-        text: 'Treasures rain down from the aurora sky! <b>Tap</b> them to collect. Pop <b>5 shooting stars</b> and at least <b>1 heart</b> to finish the chapter.',
+        text: 'Treasures rain down from the aurora sky! <b>Tap</b> them to collect. Pop <b>5 shooting stars</b> and <b>5 hearts</b> to finish the chapter.',
         start: () => openGame1()
       },
       1: {
         icon: HOWTO_ICONS[1], title: 'Swiss Cannon',
-        text: '<b>Move</b> the cannon left &amp; right, <b>hold</b> to charge the power meter, then <b>release</b> to fire! Blast <b>5 chocolates</b> and <b>2 hearts</b>.',
+        text: '<b>Move</b> the cannon left &amp; right, <b>hold</b> to charge the power meter, then <b>release</b> to fire! Blast <b>5 chocolates</b> and <b>5 hearts</b>.',
         start: () => openGame2()
       },
       2: {
@@ -5136,7 +5136,211 @@ Now it's time for the part everyone has been waiting for.`
     });
 
     /* CONTINUE pressed -> chapter complete: celebrate, swap to thumbs-up, show "well done" card */
+    /* ── fcCollectHearts: level-transition heart-collect overlay ──────────
+       Defined here so it's available to endGame1/endGame2 callbacks.       */
+    window.fcCollectHearts = function fcCollectHearts(count, onDone) {
+      var overlay = document.createElement('div');
+      overlay.style.cssText =
+        'position:fixed;inset:0;z-index:9990;pointer-events:none;' +
+        'opacity:0;transition:opacity 0.45s ease;';
+      document.body.appendChild(overlay);
+      var dim = document.createElement('div');
+      dim.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,.52);';
+      overlay.appendChild(dim);
+      /* Instruction label above hearts */
+      var sz = 54, gap = 78, safeBottom = 90;
+      var totalW = (count - 1) * gap;
+      var baseCX = window.innerWidth  / 2;
+      var baseCY = window.innerHeight - safeBottom - sz / 2;
+      var lbl = document.createElement('div');
+      lbl.style.cssText =
+        'position:absolute;left:0;right:0;' +
+        'top:' + (baseCY - sz / 2 - 64) + 'px;' +
+        'text-align:center;color:#fff;' +
+        'font-family:inherit;font-size:clamp(14px,4vw,17px);font-weight:700;' +
+        'letter-spacing:0.15px;line-height:1.45;' +
+        'text-shadow:0 1px 8px rgba(0,0,0,.9),0 0 24px rgba(0,0,0,.5);' +
+        'padding:0 24px;pointer-events:none;';
+      lbl.textContent = '❤️ Tap each heart to collect your reward!';
+      overlay.appendChild(lbl);
+      /* Show overlay */
+      requestAnimationFrame(function() { requestAnimationFrame(function() {
+        overlay.style.opacity   = '1';
+        overlay.style.pointerEvents = 'auto';
+      }); });
+      /* Hearts */
+      var collected = 0;
+      for (var i = 0; i < count; i++) {
+        (function(idx) {
+          var hx    = baseCX - totalW / 2 + idx * gap;
+          var hy    = baseCY;
+          var delay = 500 + idx * 120;
+          var uid   = 'fcc' + Date.now() + '_' + idx;
+          var h = document.createElement('div');
+          h.style.cssText =
+            'position:absolute;z-index:1;' +
+            'width:' + sz + 'px;height:' + sz + 'px;' +
+            'left:' + (hx - sz / 2) + 'px;top:' + (hy - sz / 2) + 'px;' +
+            'transform:scale(0);opacity:0;' +
+            'transition:transform 0.38s cubic-bezier(.2,1.35,.4,1) ' + delay + 'ms,' +
+                       'opacity 0.3s ease ' + delay + 'ms;' +
+            'filter:drop-shadow(0 0 9px rgba(255,80,120,.85));' +
+            'touch-action:manipulation;-webkit-tap-highlight-color:transparent;' +
+            'cursor:pointer;will-change:transform,opacity;';
+          h.innerHTML = SVG_HEART
+            .replace(/id="hg"/g,      'id="' + uid + '"')
+            .replace(/url\(#hg\)/g,   'url(#' + uid + ')')
+            .replace('width="42" height="42"', 'width="' + sz + '" height="' + sz + '"');
+          overlay.appendChild(h);
+          requestAnimationFrame(function() { requestAnimationFrame(function() {
+            h.style.transform = 'scale(1)'; h.style.opacity = '1';
+          }); });
+          var bobT = setTimeout(function() {
+            h.style.transition = '';
+            h.style.animation  = 'fcPopHrtBob 1.95s ease-in-out infinite ' + (idx * 0.33) + 's';
+          }, delay + 430);
+          function collectOne(e) {
+            if (h._done) return; h._done = true;
+            clearTimeout(bobT); e.stopPropagation();
+            if (e.cancelable) e.preventDefault();
+            h.style.animation  = 'none';
+            h.style.transition = 'transform 0.18s cubic-bezier(.2,1.4,.4,1), opacity 0.15s ease';
+            h.style.transform  = 'scale(1.55)'; h.style.opacity = '0';
+            window.fcHearts = (window.fcHearts || 0) + 1;
+            setTimeout(function() {
+              try { h.remove(); } catch(er) {}
+              collected++;
+              if (collected >= count) {
+                overlay.style.opacity = '0';
+                setTimeout(function() {
+                  try { overlay.remove(); } catch(er) {}
+                  onDone();
+                }, 480);
+              }
+            }, 200);
+          }
+          h.addEventListener('touchstart', function(e) { e.stopPropagation(); }, { passive: true });
+          h.addEventListener('touchend',   collectOne, { passive: false });
+          h.addEventListener('click',      collectOne);
+        })(i);
+      }
+    };
+
     function completeCurrent() {
+
+    /* ── fcCollectHearts: level-transition heart-collect overlay ───────── */
+    /* Shows `count` tappable hearts over the screen; each tap earns +1 heart.
+       Calls onDone() after all hearts are collected.                        */
+    window.fcCollectHearts = function(count, onDone) {
+      var overlay = document.createElement('div');
+      overlay.style.cssText =
+        'position:fixed;inset:0;z-index:9990;pointer-events:none;' +
+        'opacity:0;transition:opacity 0.45s ease;';
+      document.body.appendChild(overlay);
+
+      /* Dim background */
+      var dim = document.createElement('div');
+      dim.style.cssText =
+        'position:absolute;inset:0;background:rgba(0,0,0,.52);';
+      overlay.appendChild(dim);
+
+      /* Instruction label */
+      var lbl = document.createElement('div');
+      lbl.style.cssText =
+        'position:absolute;left:0;right:0;bottom:' + (90 + 52 + 20) + 'px;' +
+        'text-align:center;color:#fff;' +
+        'font-family:inherit;font-size:clamp(14px,4vw,17px);font-weight:700;' +
+        'letter-spacing:0.15px;line-height:1.45;' +
+        'text-shadow:0 1px 8px rgba(0,0,0,.9),0 0 24px rgba(0,0,0,.5);' +
+        'padding:0 24px;pointer-events:none;';
+      lbl.textContent = '❤️ Tap each heart to collect your reward!';
+      overlay.appendChild(lbl);
+
+      /* Enable overlay */
+      requestAnimationFrame(function() { requestAnimationFrame(function() {
+        overlay.style.opacity = '1';
+        overlay.style.pointerEvents = 'auto';
+      }); });
+
+      /* Build hearts after label fades in */
+      var sz = 54, gap = 78, safeBottom = 90;
+      var totalW = (count - 1) * gap;
+      var baseCX = window.innerWidth  / 2;
+      var baseCY = window.innerHeight - safeBottom - sz / 2;
+      var collected = 0;
+
+      for (var i = 0; i < count; i++) {
+        (function(idx) {
+          var hx    = baseCX - totalW / 2 + idx * gap;
+          var hy    = baseCY;
+          var delay = 500 + idx * 120;   /* stagger; first waits for label */
+          var uid   = 'fcc' + Date.now() + '_' + idx;
+
+          var h = document.createElement('div');
+          h.style.cssText =
+            'position:absolute;z-index:1;' +
+            'width:' + sz + 'px;height:' + sz + 'px;' +
+            'left:' + (hx - sz / 2) + 'px;top:' + (hy - sz / 2) + 'px;' +
+            'transform:scale(0);opacity:0;' +
+            'transition:transform 0.38s cubic-bezier(.2,1.35,.4,1) ' + delay + 'ms,' +
+                       'opacity 0.3s ease ' + delay + 'ms;' +
+            'filter:drop-shadow(0 0 9px rgba(255,80,120,.85));' +
+            'touch-action:manipulation;-webkit-tap-highlight-color:transparent;' +
+            'cursor:pointer;will-change:transform,opacity;';
+          h.innerHTML = SVG_HEART
+            .replace(/id="hg"/g,        'id="' + uid + '"')
+            .replace(/url\(#hg\)/g,   'url(#' + uid + ')')
+            .replace('width="42" height="42"', 'width="' + sz + '" height="' + sz + '"');
+          overlay.appendChild(h);
+
+          /* Appear */
+          requestAnimationFrame(function() { requestAnimationFrame(function() {
+            h.style.transform = 'scale(1)';
+            h.style.opacity   = '1';
+          }); });
+
+          /* Bob after appear */
+          var bobT = setTimeout(function() {
+            h.style.transition = '';
+            h.style.animation  = 'fcPopHrtBob 1.95s ease-in-out infinite ' + (idx * 0.33) + 's';
+          }, delay + 430);
+
+          function collectOne(e) {
+            if (h._done) return;
+            h._done = true;
+            clearTimeout(bobT);
+            e.stopPropagation();
+            if (e.cancelable) e.preventDefault();
+
+            /* Pop burst */
+            h.style.animation  = 'none';
+            h.style.transition = 'transform 0.18s cubic-bezier(.2,1.4,.4,1), opacity 0.15s ease';
+            h.style.transform  = 'scale(1.55)';
+            h.style.opacity    = '0';
+
+            /* Earn the heart */
+            window.fcHearts = (window.fcHearts || 0) + 1;
+
+            setTimeout(function() {
+              try { h.remove(); } catch(er) {}
+              collected++;
+              if (collected >= count) {
+                /* All collected — fade overlay, then proceed */
+                overlay.style.opacity = '0';
+                setTimeout(function() {
+                  try { overlay.remove(); } catch(er) {}
+                  onDone();
+                }, 480);
+              }
+            }, 200);
+          }
+
+          h.addEventListener('touchstart', function(e) { e.stopPropagation(); }, { passive: true });
+          h.addEventListener('touchend',   collectOne, { passive: false });
+          h.addEventListener('click',      collectOne);
+        })(i);
+      }
+    };
       const i = current;
       const el = document.getElementById('lv' + i);
       el.classList.remove('active');
@@ -5283,7 +5487,7 @@ Now it's time for the part everyone has been waiting for.`
     function spawnItem() {
       let type;
       const r = Math.random();
-      if (g1.hearts < 1 && g1.sinceHeart > 4) type = 'heart';
+      if (g1.hearts < 5 && g1.sinceHeart > 3) type = 'heart';
       else if (g1.shoot < 5 && r < 0.42) type = 'shoot';
       else if (r < 0.60) type = 'star';
       else if (r < 0.80) type = 'crystal';
@@ -5338,7 +5542,7 @@ Now it's time for the part everyone has been waiting for.`
       itemBurst(cx, cy, col, heart ? 28 : 16, heart ? 160 : 90);
       popText(cx, cy - (heart ? 60 : 20), '+' + it.def.pts, '');
       updateG1HUD();
-      if (g1.hearts >= 1 && g1.shoot >= 5 && !g1.finish.classList.contains('show')) {
+      if (g1.hearts >= 5 && g1.shoot >= 5 && !g1.finish.classList.contains('show')) {
         g1.finish.classList.add('show', 'btn-start');
         popText(window.innerWidth / 2, window.innerHeight * 0.42, 'Goal reached!', '');
       }
@@ -5387,8 +5591,8 @@ Now it's time for the part everyone has been waiting for.`
       /* Heart chip */
       const ch = document.getElementById('chipHeart');
       ch.innerHTML = SVG_HEART.replace('width="42" height="42"', 'width="22" height="22"') +
-        ' ' + g1.hearts + ' / 1';
-      ch.classList.toggle('met', g1.hearts >= 1);
+        ' ' + g1.hearts + ' / 5';
+      ch.classList.toggle('met', g1.hearts >= 5);
 
       /* Shooting star chip */
       const cs = document.getElementById('chipShoot');
@@ -5411,7 +5615,8 @@ Now it's time for the part everyone has been waiting for.`
       g1.running = false; cancelAnimationFrame(g1.raf);
       g1.field.innerHTML = ''; g1.items = [];
       levelStats[0] = { hearts: g1.hearts, shoot: g1.shoot, stars: g1.stars, crystals: g1.crystals, score: g1.score };
-      window.fcHearts = (window.fcHearts || 0) + 5;   /* Chapter 1 reward: +5 hearts */
+      /* Award exactly the hearts the player collected during gameplay */
+      window.fcHearts = (window.fcHearts || 0) + g1.hearts;
       g1.el.classList.remove('show');
       completeCurrent();
     }
@@ -5420,7 +5625,7 @@ Now it's time for the part everyone has been waiting for.`
        SWISS CANNON — Level 2 mini-game
        Move the cannon left/right, HOLD to charge power (meter ping-pongs),
        release to fire a cannonball straight up. Blast the floating
-       chocolates & hearts (custom SVG). Hit 5 chocolates + 2 hearts.
+       chocolates & hearts (custom SVG). Hit 5 chocolates + 5 hearts.
     ==================================================================== */
     /* Level 2 uses the same SVG_HEART for consistency */
     const HEART_SVG = SVG_HEART.replace('width="42" height="42"', 'width="32" height="32"').replace('viewBox="0 0 42 42"', 'viewBox="0 0 42 42"');
@@ -5745,10 +5950,10 @@ Now it's time for the part everyone has been waiting for.`
       bigBoom(cx, cy, heart ? '#ff5d7a' : '#ffb347', html);   // HUGE explosion
       popText(cx, cy - 70, '+' + (heart ? 40 : 20), '');
       updateG2HUD();
-      const type = (g2.hearts < 2 && Math.random() < 0.45) ? 'heart' : 'choc';
+      const type = (g2.hearts < 5 && Math.random() < 0.52) ? 'heart' : 'choc';
       const W = window.innerWidth;
       g2.targets.push(makeTarget(type, W * 0.12 + Math.random() * (W * 0.76), 110 + Math.random() * 90));
-      if (g2.choc >= 5 && g2.hearts >= 2 && !g2.finish.classList.contains('show')) {
+      if (g2.choc >= 5 && g2.hearts >= 5 && !g2.finish.classList.contains('show')) {
         g2.finish.classList.add('show', 'btn-start');
         popText(window.innerWidth / 2, window.innerHeight * 0.42, 'Goal reached!', '');
       }
@@ -5786,8 +5991,8 @@ Now it's time for the part everyone has been waiting for.`
       cc.classList.toggle('met', g2.choc >= 5);
       /* Heart chip — uses the shared SVG_HEART */
       const hh = document.getElementById('g2heart');
-      hh.innerHTML = SVG_HEART.replace('width="42" height="42"', 'width="22" height="22"') + ' ' + g2.hearts + ' / 2';
-      hh.classList.toggle('met', g2.hearts >= 2);
+      hh.innerHTML = SVG_HEART.replace('width="42" height="42"', 'width="22" height="22"') + ' ' + g2.hearts + ' / 5';
+      hh.classList.toggle('met', g2.hearts >= 5);
     }
     function tryFinish2(e) { if (g2.running && g2.finish.classList.contains('show')) { e && e.preventDefault(); endGame2(); } }
     g2.finish.addEventListener('click', tryFinish2);
@@ -5801,7 +6006,8 @@ Now it's time for the part everyone has been waiting for.`
       g2.ball = null; g2.ballEl.style.opacity = '0'; g2.ballEl.style.visibility = 'hidden'; g2.charging = false;
       g2.powerEl.classList.remove('show');
       levelStats[1] = { choc: g2.choc, hearts: g2.hearts, score: g2.score };
-      window.fcHearts = (window.fcHearts || 0) + 5;   /* Chapter 2 reward: +5 hearts */
+      /* Award = hearts the player shot with the cannon (max 5) */
+      window.fcHearts = (window.fcHearts || 0) + Math.min(5, g2.hearts);
       g2.el.classList.remove('show');
       completeCurrent();
     }
