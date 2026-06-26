@@ -2958,6 +2958,93 @@
   100% { transform: translateY(-120px) scale(0.4); opacity: 0; }
 }
 
+/* ── Heart Counter ─────────────────────────────────────────────────────────── */
+#fcHeartCounter {
+  position: absolute;
+  bottom: calc(clamp(10px,2vh,20px) + env(safe-area-inset-bottom,0px) + 90px);
+  left: 0; right: 0;
+  display: flex; align-items: center; justify-content: center;
+  gap: 4px; flex-wrap: wrap;
+  z-index: 21; pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+.fc-hrt-ic {
+  display: inline-flex; align-items: center;
+  filter: drop-shadow(0 0 4px rgba(255,80,110,.7));
+  transition: transform 0.2s ease;
+}
+.fc-hrt-ic.fc-hrt-pop {
+  animation: fcHrtPop 0.35s ease;
+}
+@keyframes fcHrtPop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.6); }
+  100% { transform: scale(1); }
+}
+
+/* ── Gift UI ───────────────────────────────────────────────────────────────── */
+#fcGiftUI {
+  position: absolute; inset: 0; z-index: 25;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding-bottom: calc(clamp(10px,2vh,20px) + env(safe-area-inset-bottom,0px) + 15px);
+  pointer-events: none; opacity: 0;
+  transition: opacity 0.3s ease;
+}
+#fcGiftUI.fc-gift-show {
+  opacity: 1; pointer-events: auto;
+}
+#fcGiftBox {
+  background: rgba(12,5,25,0.93);
+  border: 1.5px solid rgba(255,100,160,0.45);
+  border-radius: 18px;
+  box-shadow: 0 0 30px rgba(255,80,140,.25), 0 0 60px rgba(180,60,255,.1);
+  padding: clamp(14px,3vw,22px) clamp(16px,4vw,28px);
+  text-align: center; max-width: 340px; width: 88%;
+}
+#fcGiftTitle {
+  font-size: clamp(12px, 2.5vw, 15px);
+  color: rgba(255,200,230,.9); letter-spacing: 0.4px; margin-bottom: 10px;
+}
+#fcGiftCount {
+  font-size: clamp(22px, 5vw, 30px); font-weight: 700;
+  color: #ff6b9d; margin-bottom: 12px;
+  transition: transform 0.15s ease;
+}
+#fcGiftNum { display: inline-block; transition: transform 0.15s ease; }
+#fcGiftControls {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+}
+.fc-gift-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,100,160,.18); border: 1.5px solid rgba(255,120,170,.5);
+  color: #ffb3d0; font-size: 20px; font-weight: 600; line-height: 1;
+  cursor: pointer; flex-shrink: 0;
+  transition: background 0.15s ease, transform 0.1s ease;
+  display: flex; align-items: center; justify-content: center;
+}
+.fc-gift-btn:active { background: rgba(255,100,160,.35); transform: scale(0.9); }
+#fcGiftRange {
+  flex: 1; -webkit-appearance: none; appearance: none;
+  height: 5px; border-radius: 3px;
+  background: linear-gradient(to right, #ff6b9d 0%, rgba(255,107,157,.25) 100%);
+  outline: none;
+}
+#fcGiftRange::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%;
+  background: #ff6b9d; box-shadow: 0 0 8px rgba(255,107,157,.7);
+  cursor: pointer;
+}
+#fcGiftConfirm {
+  background: linear-gradient(135deg, #c4003e, #8b0037);
+  border: none; border-radius: 50px; cursor: pointer;
+  padding: 9px 22px; color: #fff;
+  font-size: clamp(12px, 2.5vw, 14px); font-weight: 600; letter-spacing: 0.5px;
+  box-shadow: 0 4px 14px rgba(180,0,60,.4);
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
+}
+#fcGiftConfirm:active { transform: scale(0.95); box-shadow: 0 2px 8px rgba(180,0,60,.5); }
+
 /* Rainbow border */
 #fcRainbow {
   position: absolute; inset: 0;
@@ -3626,6 +3713,7 @@
     <!-- overlay heart images removed — centre Rengoku character heart remains -->
     <div id="fcTitle"><h1>Happy Birthday! 🎂</h1><p>From your favourite characters — and one special guide ✨</p></div>
     <div id="fcTapHint" style="opacity:0"></div>
+    <div id="fcHeartCounter" style="opacity:0;pointer-events:none;"></div>
     <div id="fcDialogue" style="opacity:0;pointer-events:none;">
       <div class="fc-dlg-card" id="fcDlgCard">
         <div class="fc-dlg-speaker" id="fcDlgSpeaker"></div>
@@ -5118,6 +5206,7 @@ Now it's time for the part everyone has been waiting for.`
       g1.running = false; cancelAnimationFrame(g1.raf);
       g1.field.innerHTML = ''; g1.items = [];
       levelStats[0] = { hearts: g1.hearts, shoot: g1.shoot, stars: g1.stars, crystals: g1.crystals, score: g1.score };
+      window.fcHearts = (window.fcHearts || 0) + 2;   /* Chapter 1 reward: +2 hearts */
       g1.el.classList.remove('show');
       completeCurrent();
     }
@@ -5507,6 +5596,7 @@ Now it's time for the part everyone has been waiting for.`
       g2.ball = null; g2.ballEl.style.opacity = '0'; g2.ballEl.style.visibility = 'hidden'; g2.charging = false;
       g2.powerEl.classList.remove('show');
       levelStats[1] = { choc: g2.choc, hearts: g2.hearts, score: g2.score };
+      window.fcHearts = (window.fcHearts || 0) + 5;   /* Chapter 2 reward: +5 hearts */
       g2.el.classList.remove('show');
       completeCurrent();
     }
@@ -6057,6 +6147,7 @@ Now it's time for the part everyone has been waiting for.`
       g3.win.classList.remove('show');
       g3.atmos.innerHTML = ''; g3.steam.innerHTML = '';
       levelStats[2] = { ingredients: g3.count, score: g3.score };
+      window.fcHearts = (window.fcHearts || 0) + 3;   /* Chapter 3 reward: +3 hearts */
       g3.el.classList.remove('show');
       completeCurrent();
     }
@@ -6917,6 +7008,147 @@ function fcBg(grad) { fcBgTint.style.background = grad; }
 /* Kick off background preload of all Level 4 character images */
 fcPreloadL4Images();
 
+/* ---- Heart counter ---- */
+function fcUpdateHeartCounter(animateLast) {
+  var el = document.getElementById('fcHeartCounter');
+  if (!el) return;
+  var n = Math.max(0, window.fcHearts || 0);
+  if (n > 0 && el.style.opacity === '0') {
+    el.style.transition = 'opacity 0.5s ease';
+    el.style.opacity = '1';
+  }
+  var buf = '';
+  for (var i = 0; i < n; i++) {
+    var uid = 'hci' + i;
+    var cls = (animateLast && i === n - 1) ? ' fc-hrt-pop' : '';
+    buf += '<span class="fc-hrt-ic' + cls + '">' +
+      SVG_HEART
+        .replace(/id="hg"/g, 'id="' + uid + '"')
+        .replace(/url\(#hg\)/g, 'url(#' + uid + ')')
+        .replace('width="42" height="42"', 'width="20" height="20"') +
+    '</span>';
+  }
+  el.innerHTML = buf;
+  if (n === 0) { el.style.opacity = '0'; }
+}
+
+/* Fly n SVG hearts from dialogue up toward charEl (GPU only) */
+function fcFlyHeartsTo(n, charEl) {
+  var fc = document.getElementById('finaleCinematic');
+  var dlg = document.getElementById('fcDialogue');
+  var fcRect = fc ? fc.getBoundingClientRect() : {left:0, top:0};
+  var charRect = charEl.getBoundingClientRect();
+  var dlgRect  = dlg  ? dlg.getBoundingClientRect()  : {top: window.innerHeight * 0.8, left: 0, width: window.innerWidth};
+  var sx = dlgRect.left + dlgRect.width  / 2 - fcRect.left;
+  var sy = dlgRect.top  - fcRect.top - 20;
+  var ex = charRect.left + charRect.width  / 2 - fcRect.left;
+  var ey = charRect.top  + charRect.height / 3 - fcRect.top;
+  var count = Math.min(n, 8);
+  for (var i = 0; i < count; i++) {
+    (function(idx) {
+      setTimeout(function() {
+        var uid = 'fht' + Date.now() + '_' + idx;
+        var sz  = 20 + Math.floor(Math.random() * 14);
+        var jx  = (Math.random() - 0.5) * 50;
+        var h   = document.createElement('div');
+        h.style.cssText =
+          'position:absolute;z-index:28;pointer-events:none;will-change:transform,opacity;' +
+          'width:' + sz + 'px;height:' + sz + 'px;' +
+          'left:' + (sx - sz / 2 + jx) + 'px;' +
+          'top:'  + (sy - sz / 2) + 'px;' +
+          'transform:translate(0,0) scale(1);opacity:1;' +
+          'transition:transform 0.85s cubic-bezier(.25,.8,.35,1),opacity 0.85s ease;';
+        h.innerHTML = SVG_HEART
+          .replace(/id="hg"/g, 'id="' + uid + '"')
+          .replace(/url\(#hg\)/g, 'url(#' + uid + ')')
+          .replace('width="42" height="42"', 'width="' + sz + '" height="' + sz + '"');
+        if (fc) fc.appendChild(h); else document.body.appendChild(h);
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            var dx = ex - (sx + jx);
+            var dy = ey - sy;
+            h.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(0.35)';
+            h.style.opacity   = '0';
+          });
+        });
+        setTimeout(function() { try { h.remove(); } catch(e){} }, 1000);
+      }, idx * 85);
+    })(i);
+  }
+}
+
+/* Gift UI — shows after trigger line, waits for user, fires hearts */
+async function fcShowGiftUI(charEl, glowColor, speaker, speakerColor, newLine, altLine) {
+  if ((window.fcHearts || 0) <= 0) {
+    if (altLine) await fcLine(speaker, speakerColor, altLine);
+    return 0;
+  }
+  if (newLine) await fcLine(speaker, speakerColor, newLine);
+  var dlgEl = document.getElementById('fcDialogue');
+  var ctrEl = document.getElementById('fcHeartCounter');
+  if (dlgEl) { dlgEl.style.opacity = '0'; dlgEl.style.pointerEvents = 'none'; }
+  if (ctrEl)   ctrEl.style.opacity = '0';
+  var prevFilter = charEl.style.filter || '';
+  charEl.style.transition = 'filter 0.4s ease';
+  charEl.style.filter = 'drop-shadow(0 0 18px ' + glowColor + ') drop-shadow(0 0 36px ' + glowColor + ')';
+  var maxH   = window.fcHearts || 0;
+  var amount = Math.max(1, Math.ceil(maxH / 2));
+  var btnHrt = SVG_HEART
+    .replace(/id="hg"/g, 'id="hgbtn"')
+    .replace(/url\(#hg\)/g, 'url(#hgbtn)')
+    .replace('width="42" height="42"', 'width="15" height="15"');
+  var gifted = await new Promise(function(resolve) {
+    var fc = document.getElementById('finaleCinematic');
+    var ui = document.createElement('div');
+    ui.id = 'fcGiftUI';
+    ui.innerHTML =
+      '<div id="fcGiftBox">' +
+        '<div id="fcGiftTitle">Gift hearts to ' + speaker + '?</div>' +
+        '<div id="fcGiftCount"><span id="fcGiftNum">' + amount + '</span><span style="opacity:.55;font-size:.65em"> / ' + maxH + '</span></div>' +
+        '<div id="fcGiftControls">' +
+          '<button class="fc-gift-btn" id="fcGiftMinus">&#8722;</button>' +
+          '<input type="range" id="fcGiftRange" min="0" max="' + maxH + '" value="' + amount + '" step="1">' +
+          '<button class="fc-gift-btn" id="fcGiftPlus">&#43;</button>' +
+        '</div>' +
+        '<button id="fcGiftConfirm">Send ' + btnHrt + '</button>' +
+      '</div>';
+    fc.appendChild(ui);
+    requestAnimationFrame(function() { requestAnimationFrame(function() { ui.classList.add('fc-gift-show'); }); });
+    var numEl   = ui.querySelector('#fcGiftNum');
+    var rangeEl = ui.querySelector('#fcGiftRange');
+    function setAmt(v) {
+      amount = Math.max(0, Math.min(maxH, v));
+      rangeEl.value     = amount;
+      numEl.textContent = amount;
+      numEl.style.transform = 'scale(1.25)';
+      setTimeout(function() { numEl.style.transform = 'scale(1)'; }, 140);
+    }
+    rangeEl.addEventListener('input',  function() { setAmt(parseInt(rangeEl.value, 10)); });
+    ui.querySelector('#fcGiftMinus').addEventListener('click', function() { setAmt(amount - 1); });
+    ui.querySelector('#fcGiftPlus' ).addEventListener('click', function() { setAmt(amount + 1); });
+    ui.querySelector('#fcGiftConfirm').addEventListener('click', function() {
+      ui.classList.remove('fc-gift-show');
+      setTimeout(function() { try { ui.remove(); } catch(e){} }, 350);
+      resolve(amount);
+    });
+  });
+  if (gifted > 0) {
+    fcFlyHeartsTo(gifted, charEl);
+    await fcDelay(950);
+    window.fcHearts = Math.max(0, (window.fcHearts || 0) - gifted);
+    fcUpdateHeartCounter(false);
+  }
+  charEl.style.transition = 'filter 0.4s ease';
+  charEl.style.filter = prevFilter;
+  await fcDelay(200);
+  if (ctrEl) { ctrEl.style.transition = 'opacity 0.4s ease'; ctrEl.style.opacity = (window.fcHearts||0) > 0 ? '1' : '0'; }
+  if (dlgEl) { dlgEl.style.opacity = ''; dlgEl.style.pointerEvents = ''; }
+  return gifted;
+}
+
+/* Show counter on Level 4 init — hearts earned from chapters 1-3 */
+(function() { if ((window.fcHearts || 0) > 0) fcUpdateHeartCounter(false); })();
+
 /* ---- Phase 1: Spirit Host Intro ---- */
 async function fcPhase1_SpiritIntro() {
   fcBg('radial-gradient(ellipse at center, #001a2a 0%, #050010 100%)');
@@ -7049,6 +7281,14 @@ async function fcPhase4_DSReveal() {
   fcFloatHearts(5);
   await fcLine('Demon Slayer', FC_COL.ds, "We're sending all our love to the birthday girl!");
 
+  /* Heart gift — DS */
+  await fcShowGiftUI(
+    fcDemonSlayerEl, 'rgba(180,60,255,.8)',
+    'Demon Slayer', FC_COL.ds,
+    "...Actually, would you be willing to spare a few hearts? We'll carry them with us always.",
+    "You've given everything already... *smiles warmly* That means more than you know."
+  );
+
   await fcDSToStage();
   fcHideDlg();
 }
@@ -7072,6 +7312,14 @@ async function fcPhase6_OPArrives() {
   await fcSwapCharImg(fcImgOP, 'onepieceheart-Photoroom.png');
   fcFloatHearts(6);
   await fcLine('One Piece Crew', FC_COL.op, "Our love and wishes are always with the birthday girl!");
+
+  /* Heart gift — One Piece */
+  await fcShowGiftUI(
+    fcOnePieceEl, 'rgba(255,160,40,.8)',
+    'One Piece Crew', FC_COL.op,
+    "Before we sail off — could you spare a few hearts to fuel our voyage?",
+    "Your heart's already sailing with us — that's the greatest treasure of all!"
+  );
 
   await fcOPToStage();
   fcHideDlg();
@@ -7203,6 +7451,14 @@ async function fcPhase10_GojoArrival() {
   await fcLine('Gojo Satoru', FC_COL.gojo, "May every dream you have come true. Happy Birthday!");
   await fcLine('Gojo Satoru', FC_COL.gojo, "Do not tell anyone I said that. I have a reputation to maintain. *grins*");
 
+  /* Heart gift — Gojo */
+  await fcShowGiftUI(
+    fcGojoEl, 'rgba(80,200,255,.8)',
+    'Gojo Satoru', FC_COL.gojo,
+    "Mind if I borrow a few hearts too? Just to keep things interesting.",
+    "...You've already given it all. *quiet smile* That's very like you."
+  );
+
   await fcGojoToStage();
   fcHideDlg();
 }
@@ -7248,6 +7504,14 @@ async function fcPhase12_RengokuArrival() {
   await fcSwapCharImg(fcImgRengoku, 'rengokuheartlarge.png');
   fcFloatHearts(6);
   await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "HOW COULD ANYONE NOT ADORE HER? SHE'S ABSOLUTELY WONDERFUL!");
+
+  /* Heart gift — Rengoku */
+  await fcShowGiftUI(
+    fcRengokuEl, 'rgba(255,100,40,.8)',
+    'Rengoku Kyojuro', FC_COL.rengoku,
+    "I'VE COME TO COLLECT EVERY LAST BIT OF YOUR INFINITE LOVE! WOULD YOU HONOUR ME?!",
+    "YOUR HEART IS ALREADY FULLY COMMITTED! THAT FLAME BURNS MAGNIFICENTLY!"
+  );
 
   /* ── Step 3: Lovestruck — rengokuhearthandlarge ───────────────────────── */
   await fcSwapCharImg(fcImgRengoku, 'rengokuhearthandlarge.png');
