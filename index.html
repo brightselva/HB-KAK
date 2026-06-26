@@ -1214,6 +1214,7 @@
 
     /* The cake wrapper */
     #g4Cake {
+    top: 10%;
       position: relative;
       width: min(96vw, clamp(340px, 62vh, 580px));
       height: auto;
@@ -3021,6 +3022,8 @@
   cursor: pointer; flex-shrink: 0;
   transition: background 0.15s ease, transform 0.1s ease;
   display: flex; align-items: center; justify-content: center;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+  pointer-events: auto;
 }
 .fc-gift-btn:active { background: rgba(255,100,160,.35); transform: scale(0.9); }
 #fcGiftRange {
@@ -3028,6 +3031,7 @@
   height: 5px; border-radius: 3px;
   background: linear-gradient(to right, #ff6b9d 0%, rgba(255,107,157,.25) 100%);
   outline: none;
+  touch-action: manipulation; pointer-events: auto;
 }
 #fcGiftRange::-webkit-slider-thumb {
   -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%;
@@ -3042,6 +3046,8 @@
   box-shadow: 0 4px 14px rgba(180,0,60,.4);
   display: inline-flex; align-items: center; gap: 6px;
   transition: transform 0.1s ease, box-shadow 0.15s ease;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+  pointer-events: auto;
 }
 #fcGiftConfirm:active { transform: scale(0.95); box-shadow: 0 2px 8px rgba(180,0,60,.5); }
 
@@ -3206,10 +3212,133 @@
 }
 /* ======== END CINEMATIC FINALE CSS ======== */
 
+  /* ── Heart Pop interaction ─────────────────────────────────────────────── */
+  @keyframes fcPopHrtBob {
+    0%,100% { transform: scale(1)     translateY(0px);  }
+    50%      { transform: scale(1.06) translateY(-9px); }
+  }
+  .fc-pop-heart { cursor: pointer; }
+
+  /* ── Creator Continue button ───────────────────────────────────────────── */
+  .fc-creator-tap { display: none; }   /* hide old tap hint */
+  #fcCreatorContinueBtn {
+    margin-top: clamp(18px,4vh,32px);
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    color: #fff; border: none; border-radius: 50px;
+    padding: clamp(10px,1.8vh,15px) clamp(22px,5vw,36px);
+    font-size: clamp(13px, 2.8vw, 16px); font-weight: 700;
+    cursor: pointer; letter-spacing: 0.5px;
+    box-shadow: 0 4px 20px rgba(124,58,237,.4);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.5s ease, transform 0.15s ease;
+    touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+  }
+  #fcCreatorContinueBtn.gl-show { opacity: 1; pointer-events: auto; }
+  #fcCreatorContinueBtn:active { transform: scale(0.95); }
+
+  /* ── Ending overrides ──────────────────────────────────────────────────── */
+  #fcEnding { padding: clamp(24px,6vw,60px); gap: clamp(10px,2vh,18px); }
+  #fcEnding p { margin: 0 auto; max-width: 440px; line-height: 1.7; }
+  #fcEnding p + p { opacity: 0; transition: opacity 1s 2s ease; }
+  #fcEnding p + p + p { opacity: 0; transition: opacity 1s 2.8s ease; }
+  #fcEnding.fc-show p + p,
+  #fcEnding.fc-show p + p + p { opacity: 0.7; }
+  #fcCloseJourneyBtn {
+    margin-top: clamp(20px,4vh,36px);
+    background: linear-gradient(135deg, #b91c1c, #7f1d1d);
+    color: #fff; border: none; border-radius: 50px;
+    padding: clamp(10px,1.8vh,15px) clamp(22px,5vw,36px);
+    font-size: clamp(13px, 2.8vw, 16px); font-weight: 700;
+    cursor: pointer; letter-spacing: 0.5px;
+    box-shadow: 0 4px 20px rgba(185,28,28,.4);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.6s 3.5s ease, transform 0.15s ease;
+    touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+  }
+  #fcEnding.fc-show #fcCloseJourneyBtn { opacity: 1; pointer-events: auto; }
+  #fcCloseJourneyBtn:active { transform: scale(0.95); }
+  /* Heart counter doesn't block pops */
+  #fcHeartCounter { pointer-events: none; }
+
+  /* ── Game Loader ──────────────────────────────────────────────────────── */
+  #gameLoader {
+    position: fixed; inset: 0; z-index: 99999;
+    background: radial-gradient(ellipse at center, #080018 0%, #020008 100%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: clamp(16px,4vh,32px);
+    transition: opacity 0.9s ease;
+  }
+  #gameLoader.gl-hide { opacity: 0; pointer-events: none; }
+  #glTitle {
+    font-family: inherit;
+    font-size: clamp(22px, 6vw, 42px); font-weight: 900;
+    background: linear-gradient(90deg, #ffe066, #ff3388, #c080ff, #33ccff, #ffe066);
+    background-size: 300% auto;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmerTitle 2.2s linear infinite;
+    letter-spacing: 4px; text-align: center; padding: 0 20px;
+  }
+  #glSub {
+    font-size: clamp(12px, 2.5vw, 16px);
+    color: rgba(255,220,255,.55); letter-spacing: 1px; text-align: center;
+  }
+  #glBarWrap {
+    width: min(72vw, 320px); height: 5px;
+    background: rgba(255,255,255,.1); border-radius: 3px; overflow: hidden;
+  }
+  #glProgress {
+    height: 100%; width: 0%; border-radius: 3px;
+    background: linear-gradient(90deg, #ff3388, #c080ff, #33ccff);
+    transition: width 0.3s ease;
+  }
+  #glPercent {
+    font-size: clamp(11px, 2vw, 14px);
+    color: rgba(255,200,255,.5); letter-spacing: 1px;
+  }
+
+  /* ── Cake Continue Button ─────────────────────────────────────────────── */
+  #g4ContinueBtn {
+    position: absolute;
+    bottom: calc(clamp(18px,5vh,48px) + env(safe-area-inset-bottom,0px));
+    left: 50%; transform: translateX(-50%);
+    background: linear-gradient(135deg, #d4006a, #8800cc);
+    color: #fff; border: none; border-radius: 50px;
+    padding: clamp(11px,1.8vh,16px) clamp(24px,6vw,40px);
+    font-size: clamp(14px, 3.2vw, 18px); font-weight: 700;
+    letter-spacing: 0.5px; cursor: pointer; z-index: 55;
+    box-shadow: 0 4px 24px rgba(200,0,120,.45), 0 0 40px rgba(140,0,200,.2);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.6s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+    white-space: nowrap;
+  }
+  #g4ContinueBtn.gl-show { opacity: 1; pointer-events: auto; }
+  #g4ContinueBtn:active { transform: translateX(-50%) scale(0.94); box-shadow: 0 2px 12px rgba(200,0,120,.5); }
+
+  /* ── Rengoku Infinite Heart ───────────────────────────────────────────── */
+  @keyframes fcInfHrtPulse {
+    0%,100% { filter: drop-shadow(0 0 18px rgba(255,90,30,1)) drop-shadow(0 0 40px rgba(255,40,0,.7)); transform: translate(-50%,-50%) scale(1); }
+    50%      { filter: drop-shadow(0 0 32px rgba(255,130,60,1)) drop-shadow(0 0 70px rgba(255,80,0,.9)); transform: translate(-50%,-50%) scale(1.08); }
+  }
+  @keyframes fcInfAward {
+    0%   { opacity:0; transform: translateX(-50%) scale(0.5) translateY(20px); }
+    60%  { opacity:1; transform: translateX(-50%) scale(1.05) translateY(-4px); }
+    100% { opacity:1; transform: translateX(-50%) scale(1) translateY(0); }
+  }
+
   </style>
 </head>
 
 <body>
+  <!-- ── Game Loading Screen ── -->
+  <div id="gameLoader" aria-label="Loading birthday adventure">
+    <div id="glTitle">Happy Birthday!</div>
+    <div id="glSub">Loading Birthday Adventure…</div>
+    <div id="glBarWrap"><div id="glProgress"></div></div>
+    <div id="glPercent">0%</div>
+  </div>
   <div id="game">
     <div id="viewport">
       <div id="world">
@@ -3564,6 +3693,7 @@
           and all the love you deserve.<br><br>
           Have the most wonderful birthday! ❤️
         </div>
+        <button id="g4ContinueBtn" aria-label="Continue to Final Chapter">Continue Journey ✨</button>
       </div>
     </div>
 
@@ -3726,13 +3856,75 @@
       <h2>A Message from the Creator ✨</h2>
       <p id="fcCreatorMsg"></p>
       <div class="fc-creator-tap">Tap to continue</div>
+      <button id="fcCreatorContinueBtn">Continue →</button>
     </div>
-    <div id="fcEnding"><h2>Thanks for celebrating with us ❤️</h2><p>The End</p></div>
+    <div id="fcEnding">
+      <h2>Thanks for celebrating this birthday with us ❤️</h2>
+      <p>We hope this little adventure brought smiles, laughter, and unforgettable memories.</p>
+      <p>Wishing you endless happiness, love, and wonderful moments ahead.</p>
+      <p>Until the next adventure...</p>
+      <button id="fcCloseJourneyBtn">Close Journey</button>
+    </div>
   </div>
   </div>
 
   <script>
     "use strict";
+
+    /* ── Game asset preloader — runs immediately, hides loader when ready ── */
+    (function() {
+      var ASSETS = [
+        'spirit.png','spiritgreeting.png','spiritheart.png','spirittapview.png',
+        'spirituppoint.png','spiritthumbsuptorso.png','spiritthumsup.png',
+        'spiritwinkandthumbsup.png',
+        'naruto.png','narutopeeking.png','narutoheart.png','narutohiss.png','thumbsupnaruto.png',
+        'demonslayer.png','netaze.png','demonslayerwelcome.png','demonslayerheart.png',
+        'demonslayerrightview.png','demonslayrupview.png',
+        'onepiece.png','onepiecewelcome-Photoroom.png','onepieceheart-Photoroom.png',
+        'onepiecerightside-Photoroom.png',
+        'gojowaving.png','gojopeeking-Photoroom.png','gojoheart-Photoroom.png',
+        'rengoku.png','rengokuwavelarge.png','rengokuheartlarge.png',
+        'rengokuhearthandlarge.png','rengokuheart.png',
+        'northernlight.png','switzerland.png','swiss.png','japan.png','ichiraku.png',
+        'surprise.png'
+      ];
+      var loader = document.getElementById('gameLoader');
+      var bar    = document.getElementById('glProgress');
+      var pct    = document.getElementById('glPercent');
+      var loaded = 0, total = ASSETS.length;
+      var hidden = false;
+
+      function hideLoader() {
+        if (hidden) return; hidden = true;
+        if (!loader) return;
+        loader.classList.add('gl-hide');
+        setTimeout(function() { loader.style.display = 'none'; }, 950);
+      }
+
+      function onOne() {
+        loaded++;
+        var p = Math.round(loaded / total * 100);
+        if (bar)  bar.style.width  = p + '%';
+        if (pct)  pct.textContent  = p + '%';
+        if (loaded >= total) hideLoader();
+      }
+
+      /* Fallback: hide after 14s regardless */
+      setTimeout(hideLoader, 14000);
+
+      if (!total) { hideLoader(); return; }
+
+      ASSETS.forEach(function(src) {
+        var img = new Image();
+        img.src = src;
+        if (typeof img.decode === 'function') {
+          img.decode().then(onOne).catch(onOne);
+        } else {
+          img.onload  = onOne;
+          img.onerror = onOne;
+        }
+      });
+    })();
 
     // PHASE 13: Throttled mouse move functions
     function throttle(fn, limit) {
@@ -4622,8 +4814,21 @@ Now it's time for the part everyone has been waiting for.`
         }
       }, 800);
 
-      // 6) Close after celebration
-      setTimeout(() => endGame4(), 3800);
+      // 6) Show "Continue Journey" button — user must tap to proceed
+      setTimeout(() => {
+        var btn = document.getElementById('g4ContinueBtn');
+        if (!btn) { endGame4(); return; }   /* safety fallback */
+        btn.classList.add('gl-show');
+        var _done = false;
+        function doEnd(e) {
+          if (_done) return; _done = true;
+          if (e && e.cancelable) e.preventDefault();
+          btn.classList.remove('gl-show');
+          setTimeout(endGame4, 380);
+        }
+        btn.addEventListener('click',    doEnd,                         { once: true });
+        btn.addEventListener('touchend', doEnd, { once: true, passive: false });
+      }, 3200);
     }
 
     // ── Horizontal wind breeze sweeping across the cake candles ─────────────
@@ -5206,7 +5411,7 @@ Now it's time for the part everyone has been waiting for.`
       g1.running = false; cancelAnimationFrame(g1.raf);
       g1.field.innerHTML = ''; g1.items = [];
       levelStats[0] = { hearts: g1.hearts, shoot: g1.shoot, stars: g1.stars, crystals: g1.crystals, score: g1.score };
-      window.fcHearts = (window.fcHearts || 0) + 2;   /* Chapter 1 reward: +2 hearts */
+      window.fcHearts = (window.fcHearts || 0) + 5;   /* Chapter 1 reward: +5 hearts */
       g1.el.classList.remove('show');
       completeCurrent();
     }
@@ -6147,7 +6352,7 @@ Now it's time for the part everyone has been waiting for.`
       g3.win.classList.remove('show');
       g3.atmos.innerHTML = ''; g3.steam.innerHTML = '';
       levelStats[2] = { ingredients: g3.count, score: g3.score };
-      window.fcHearts = (window.fcHearts || 0) + 3;   /* Chapter 3 reward: +3 hearts */
+      /* Chapter 3: no additional hearts (total 10 already earned from Ch1+Ch2) */
       g3.el.classList.remove('show');
       completeCurrent();
     }
@@ -6626,6 +6831,11 @@ const fcGojoEl    = document.getElementById('fcGojo');
 const fcRengokuEl = document.getElementById('fcRengoku');
 const fcSpiritEl  = document.getElementById('fcSpirit');
 
+/* Aliases for Heart Gift system — reuses existing refs, no new DOM queries */
+const fcDemonSlayerEl = fcDS;
+const fcOnePieceEl    = fcOP;
+const fcNarutoEl      = fcNaruto;
+
 /* ---- Character image elements ---- */
 const fcImgNaruto  = document.getElementById('fcImgNaruto');
 const fcImgDS      = document.getElementById('fcImgDS');
@@ -6668,7 +6878,11 @@ function fcWaitTap() {
 }
 
 fc.addEventListener('click', function(){ fcHandleTap(); });
-fc.addEventListener('touchstart', function(e){ e.preventDefault(); fcHandleTap(); }, {passive:false});
+fc.addEventListener('touchstart', function(e){
+  /* Skip when Gift UI is open — its buttons need untampered touch events */
+  if (document.getElementById('fcGiftUI') && document.getElementById('fcGiftUI').classList.contains('fc-gift-show')) return;
+  e.preventDefault(); fcHandleTap();
+}, {passive:false});
 
 function fcHandleTap() {
   if (fcSpecialTap) { fcSpecialTap(); return; }
@@ -6684,17 +6898,17 @@ function fcPreloadL4Images() {
     /* Spirit */
     'spiritgreeting.png','spirit.png','spirittapview.png','spirituppoint.png','spiritheart.png',
     /* Naruto */
-    'naruto.png','narutoheart.png','narutohiss.png','thumbsupnaruto.png',
+    'narutoheart.png','narutohiss.png','thumbsupnaruto.png',
     /* Gojo */
     'gojowaving.png','gojopeeking-Photoroom.png','gojoheart-Photoroom.png',
     /* Rengoku */
-    'rengoku.png','rengokuwavelarge.png','rengokuheartlarge.png',
+    'rengokuwavelarge.png','rengokuheartlarge.png',
     'rengokuhearthandlarge.png','rengokuheart.png',
     /* Demon Slayer */
-    'demonslayer.png','demonslayerwelcome.png','demonslayerheart.png',
+    'demonslayerwelcome.png','demonslayerheart.png',
     'demonslayerrightview.png','demonslayrupview.png',
     /* One Piece */
-    'onepiece.png','onepieceheart-Photoroom.png','onepiecerightside-Photoroom.png'
+    'onepieceheart-Photoroom.png','onepiecerightside-Photoroom.png'
   ];
   imgs.forEach(function(src) {
     var img = new Image();
@@ -7123,14 +7337,31 @@ async function fcShowGiftUI(charEl, glowColor, speaker, speakerColor, newLine, a
       numEl.style.transform = 'scale(1.25)';
       setTimeout(function() { numEl.style.transform = 'scale(1)'; }, 140);
     }
+    /* Stop all touches on the gift UI from bubbling to #finaleCinematic's touchstart guard */
+    ui.addEventListener('touchstart', function(e) { e.stopPropagation(); }, {passive:true});
+    ui.addEventListener('touchend',   function(e) { e.stopPropagation(); }, {passive:true});
+
     rangeEl.addEventListener('input',  function() { setAmt(parseInt(rangeEl.value, 10)); });
-    ui.querySelector('#fcGiftMinus').addEventListener('click', function() { setAmt(amount - 1); });
-    ui.querySelector('#fcGiftPlus' ).addEventListener('click', function() { setAmt(amount + 1); });
-    ui.querySelector('#fcGiftConfirm').addEventListener('click', function() {
+
+    /* Attach both click + touchend so buttons work on mobile (touchstart guard on fc is bypassed above) */
+    var minusEl  = ui.querySelector('#fcGiftMinus');
+    var plusEl   = ui.querySelector('#fcGiftPlus');
+    var confirmEl = ui.querySelector('#fcGiftConfirm');
+
+    function onMinus(e)   { e.preventDefault(); setAmt(amount - 1); }
+    function onPlus(e)    { e.preventDefault(); setAmt(amount + 1); }
+    function onConfirm(e) { e.preventDefault();
       ui.classList.remove('fc-gift-show');
       setTimeout(function() { try { ui.remove(); } catch(e){} }, 350);
       resolve(amount);
-    });
+    }
+
+    minusEl.addEventListener('touchend',   onMinus,   {passive:false});
+    minusEl.addEventListener('click',      onMinus);
+    plusEl.addEventListener('touchend',    onPlus,    {passive:false});
+    plusEl.addEventListener('click',       onPlus);
+    confirmEl.addEventListener('touchend', onConfirm, {passive:false});
+    confirmEl.addEventListener('click',    onConfirm);
   });
   if (gifted > 0) {
     fcFlyHeartsTo(gifted, charEl);
@@ -7148,6 +7379,275 @@ async function fcShowGiftUI(charEl, glowColor, speaker, speakerColor, newLine, a
 
 /* Show counter on Level 4 init — hearts earned from chapters 1-3 */
 (function() { if ((window.fcHearts || 0) > 0) fcUpdateHeartCounter(false); })();
+
+/* ── Heart Popping interaction ─────────────────────────────────────────── */
+/* Shows `count` tappable hearts at the bottom; instrText fades in above them */
+async function fcShowHeartPop(charEl, glowColor, count, instrText) {
+  var available = Math.min(count, window.fcHearts || 0);
+  if (available <= 0) return 0;
+
+  var dlgEl  = document.getElementById('fcDialogue');
+  var hcEl   = document.getElementById('fcHeartCounter');
+  var fc     = document.getElementById('finaleCinematic');
+  var fcRect = fc ? fc.getBoundingClientRect() : { left:0, top:0 };
+
+  if (dlgEl) { dlgEl.style.opacity = '0'; dlgEl.style.pointerEvents = 'none'; }
+  /* Hide counter for the duration of the pop interaction */
+  if (hcEl) { hcEl.style.transition = 'opacity 0.3s ease'; hcEl.style.opacity = '0'; hcEl.style.pointerEvents = 'none'; }
+
+  /* Glow on character */
+  charEl.style.transition = 'filter 0.3s ease';
+  charEl.style.filter = 'drop-shadow(0 0 16px ' + glowColor + ') drop-shadow(0 0 32px ' + glowColor + ')';
+
+  /* Bottom layout constants */
+  var sz         = 52;       /* heart icon size */
+  var gap        = 76;       /* spacing between heart centres */
+  var safeBottom = 90;       /* px above viewport bottom */
+  var totalW     = (available - 1) * gap;
+  var baseCX     = window.innerWidth  / 2 - fcRect.left;
+  var baseCY     = window.innerHeight - fcRect.top - safeBottom - sz / 2;
+
+  /* Instruction message — fades in before hearts appear */
+  var instrEl = null;
+  if (instrText && fc) {
+    var instrTop = baseCY - sz / 2 - 60;   /* 60px above top edge of hearts */
+    instrEl = document.createElement('div');
+    instrEl.style.cssText =
+      'position:absolute;z-index:25;left:0;right:0;' +
+      'top:' + instrTop + 'px;text-align:center;' +
+      'color:#fff;font-size:clamp(13px,3.8vw,16px);font-weight:600;' +
+      'letter-spacing:0.15px;line-height:1.45;' +
+      'text-shadow:0 1px 8px rgba(0,0,0,.85),0 0 24px rgba(0,0,0,.5);' +
+      'padding:0 24px;opacity:0;transition:opacity 0.55s ease;' +
+      'pointer-events:none;';
+    instrEl.textContent = instrText;
+    fc.appendChild(instrEl);
+    requestAnimationFrame(function() { requestAnimationFrame(function() {
+      instrEl.style.opacity = '1';
+    }); });
+    await fcDelay(600);   /* let the message read before hearts pop in */
+  }
+
+  var popped = 0;
+
+  await new Promise(function(resolve) {
+    for (var i = 0; i < available; i++) {
+      (function(idx) {
+        var hx    = baseCX - totalW / 2 + idx * gap;
+        var hy    = baseCY;
+        var uid   = 'hp' + Date.now() + '_' + idx;
+        var delay = idx * 110;  /* stagger appearance */
+
+        var h = document.createElement('div');
+        h.className = 'fc-pop-heart';
+        h.style.cssText =
+          'position:absolute;z-index:26;' +
+          'width:' + sz + 'px;height:' + sz + 'px;' +
+          'left:' + (hx - sz / 2) + 'px;top:' + (hy - sz / 2) + 'px;' +
+          'transform:scale(0);opacity:0;' +
+          'transition:transform 0.38s cubic-bezier(.2,1.35,.4,1) ' + delay + 'ms,' +
+                     'opacity 0.3s ease ' + delay + 'ms;' +
+          'filter:drop-shadow(0 0 8px rgba(255,80,120,.8));' +
+          'will-change:transform,opacity;' +
+          'touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer;';
+        h.innerHTML = SVG_HEART
+          .replace(/id="hg"/g, 'id="' + uid + '"')
+          .replace(/url\(#hg\)/g, 'url(#' + uid + ')')
+          .replace('width="42" height="42"', 'width="' + sz + '" height="' + sz + '"');
+        fc.appendChild(h);
+
+        /* Appear */
+        requestAnimationFrame(function() { requestAnimationFrame(function() {
+          h.style.transform = 'scale(1)';
+          h.style.opacity   = '1';
+        }); });
+
+        /* Start bob after appearing */
+        var bobT = setTimeout(function() {
+          h.style.transition = '';
+          h.style.animation  = 'fcPopHrtBob 1.9s ease-in-out infinite ' + (idx * 0.32) + 's';
+        }, delay + 420);
+
+        function doPopHeart(e) {
+          if (h._popped) return;
+          h._popped = true;
+          clearTimeout(bobT);
+          e.stopPropagation();
+          if (e.cancelable) e.preventDefault();
+
+          /* Pulse-up then fly */
+          h.style.animation  = 'none';
+          h.style.transition = 'transform 0.13s cubic-bezier(.2,1.4,.4,1)';
+          h.style.transform  = 'scale(1.5)';
+
+          /* Tiny sparkle */
+          var hr = h.getBoundingClientRect();
+          if (typeof fcSparkle === 'function') {
+            fcSparkle(hr.left + sz / 2, hr.top + sz / 2, '#ff80a0', 5);
+          }
+
+          setTimeout(function() {
+            /* Fly to character centre */
+            var cr = charEl.getBoundingClientRect();
+            var tx = cr.left + cr.width  / 2 - fcRect.left - hx;
+            var ty = cr.top  + cr.height / 3 - fcRect.top  - hy;
+            h.style.transition = 'transform 0.48s cubic-bezier(.35,0,.2,1), opacity 0.44s ease';
+            h.style.transform  = 'translate(' + tx + 'px,' + ty + 'px) scale(0.15)';
+            h.style.opacity    = '0';
+
+            setTimeout(function() {
+              try { h.remove(); } catch(e2){}
+              /* Decrement global counter (no visible update during pop) */
+              window.fcHearts = Math.max(0, (window.fcHearts || 0) - 1);
+              /* Brief char flash */
+              charEl.style.transition = 'filter 0.12s ease';
+              charEl.style.filter = 'drop-shadow(0 0 28px ' + glowColor + ') brightness(1.18)';
+              setTimeout(function() {
+                charEl.style.transition = 'filter 0.25s ease';
+                charEl.style.filter = 'drop-shadow(0 0 16px ' + glowColor + ')';
+              }, 130);
+              popped++;
+              if (popped >= available) resolve();
+            }, 500);
+          }, 130);
+        }
+
+        /* Both click + touchend; touchstart stops propagation to fc handler */
+        h.addEventListener('touchstart', function(e) { e.stopPropagation(); }, { passive: true });
+        h.addEventListener('touchend',   doPopHeart, { passive: false });
+        h.addEventListener('click',      doPopHeart);
+      })(i);
+    }
+  });
+
+  /* Fade out instruction, remove char glow, restore counter + dialogue */
+  if (instrEl) {
+    instrEl.style.opacity = '0';
+    setTimeout(function() { try { instrEl.remove(); } catch(e){} }, 650);
+  }
+  charEl.style.transition = 'filter 0.4s ease';
+  charEl.style.filter = '';
+  await fcDelay(280);
+  /* Sync counter value, then fade it back in */
+  fcUpdateHeartCounter(false);
+  if (hcEl) { hcEl.style.transition = 'opacity 0.45s ease'; hcEl.style.opacity = ''; hcEl.style.pointerEvents = ''; }
+  if (dlgEl) { dlgEl.style.opacity = ''; dlgEl.style.pointerEvents = ''; }
+  return popped;
+}
+
+/* Rengoku's special: all remaining hearts merge into one Infinite Heart ∞ */
+async function fcShowRengokuInfiniteGift(charEl) {
+  /* Pure cinematic — always plays after Rengoku's 2 heart pops */
+  var dlgEl = document.getElementById('fcDialogue');
+  var ctrEl = document.getElementById('fcHeartCounter');
+  var fc    = document.getElementById('finaleCinematic');
+  var fcRect = fc ? fc.getBoundingClientRect() : { left:0, top:0 };
+  var cx = window.innerWidth  / 2 - fcRect.left;
+  var cy = window.innerHeight * 0.42 - fcRect.top;
+
+  if (dlgEl) { dlgEl.style.opacity = '0'; dlgEl.style.pointerEvents = 'none'; }
+
+  /* 2) Counter hearts scatter → center */
+  if (ctrEl) {
+    var icons = ctrEl.querySelectorAll('.fc-hrt-ic');
+    icons.forEach(function(ic, idx) {
+      var r    = ic.getBoundingClientRect();
+      var sx   = r.left + r.width  / 2 - fcRect.left;
+      var sy   = r.top  + r.height / 2 - fcRect.top;
+      var fly  = document.createElement('div');
+      fly.style.cssText =
+        'position:absolute;z-index:29;pointer-events:none;will-change:transform,opacity;' +
+        'width:20px;height:20px;left:' + sx + 'px;top:' + sy + 'px;' +
+        'transform:translate(-50%,-50%) scale(1);opacity:1;' +
+        'transition:transform 0.55s cubic-bezier(.4,0,.2,1) ' + (idx * 30) + 'ms,' +
+                   'opacity 0.55s ease ' + (idx * 30) + 'ms;';
+      var uid = 'rih_fly' + idx;
+      fly.innerHTML = SVG_HEART
+        .replace(/id="hg"/g, 'id="' + uid + '"')
+        .replace(/url\(#hg\)/g, 'url(#' + uid + ')')
+        .replace('width="42" height="42"', 'width="20" height="20"');
+      fc.appendChild(fly);
+      requestAnimationFrame(function() { requestAnimationFrame(function() {
+        fly.style.transform = 'translate(' + (cx - sx) + 'px,' + (cy - sy) + 'px) scale(0.1)';
+        fly.style.opacity   = '0';
+      }); });
+      setTimeout(function() { try { fly.remove(); } catch(e){} }, 700);
+    });
+    ctrEl.style.transition = 'opacity 0.3s ease';
+    ctrEl.style.opacity    = '0';
+  }
+  await fcDelay(500);
+
+  /* 3) Rengoku glow intensifies */
+  charEl.style.transition = 'filter 0.4s ease';
+  charEl.style.filter =
+    'drop-shadow(0 0 20px rgba(255,100,30,1)) drop-shadow(0 0 50px rgba(255,50,0,.9))';
+
+  /* 4) Big ∞ heart appears at center */
+  var uid2 = 'rih_big' + Date.now();
+  var big  = document.createElement('div');
+  big.id   = 'fcInfiniteHeart';
+  big.style.cssText =
+    'position:absolute;z-index:30;pointer-events:none;will-change:transform,opacity,filter;' +
+    'left:' + cx + 'px;top:' + cy + 'px;' +
+    'width:130px;height:130px;' +
+    'transform:translate(-50%,-50%) scale(0);opacity:0;' +
+    'transition:transform 0.55s cubic-bezier(.2,1.3,.4,1),opacity 0.4s ease;';
+  big.innerHTML =
+    SVG_HEART
+      .replace(/id="hg"/g, 'id="' + uid2 + '"')
+      .replace(/url\(#hg\)/g, 'url(#' + uid2 + ')')
+      .replace('width="42" height="42"', 'width="130" height="130"') +
+    '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-58%);;' +
+      'font-size:46px;font-weight:900;color:rgba(255,210,180,.95);' +
+      'text-shadow:0 0 16px rgba(255,100,30,.9),0 0 4px #fff;">&#x221e;</div>';
+  fc.appendChild(big);
+
+  await fcDelay(40);
+  big.style.transform = 'translate(-50%,-50%) scale(1)';
+  big.style.opacity   = '1';
+  await fcDelay(500);
+
+  /* 5) Pulse 3× */
+  big.style.animation = 'fcInfHrtPulse 0.56s ease-in-out 3';
+  await fcDelay(1700);
+  big.style.animation = '';
+
+  /* 6) Award text appears below the heart */
+  var award = document.createElement('div');
+  award.style.cssText =
+    'position:absolute;z-index:31;pointer-events:none;' +
+    'left:50%;top:' + (cy + 80) + 'px;' +
+    'font-size:clamp(13px,3vw,18px);font-weight:800;letter-spacing:1px;' +
+    'color:#fff;text-align:center;white-space:nowrap;' +
+    'text-shadow:0 0 18px rgba(255,100,30,.9),0 0 6px #fff;' +
+    'opacity:0;transform:translateX(-50%);' +
+    'animation:fcInfAward 0.6s cubic-bezier(.2,1.2,.4,1) 0.1s forwards;';
+  award.textContent = '∞  Infinite Love Collected  ∞';
+  fc.appendChild(award);
+  await fcDelay(900);
+
+  /* 7) Fly heart toward Rengoku */
+  var charRect = charEl.getBoundingClientRect();
+  var tx = charRect.left + charRect.width  / 2 - fcRect.left;
+  var ty = charRect.top  + charRect.height / 3 - fcRect.top;
+  big.style.transition   = 'transform 0.65s cubic-bezier(.4,0,.2,1),opacity 0.6s ease,filter 0.5s ease';
+  award.style.transition = 'opacity 0.3s ease';
+  award.style.opacity    = '0';
+  big.style.transform    = 'translate(' + (tx - cx - 65) + 'px,' + (ty - cy - 65) + 'px) scale(0.25)';
+  big.style.opacity      = '0';
+  await fcDelay(700);
+  try { big.remove();  } catch(e){}
+  try { award.remove();} catch(e){}
+
+  /* 8) Empty counter, remove char glow, restore dialogue */
+  window.fcHearts = 0;
+  fcUpdateHeartCounter(false);
+  charEl.style.transition = 'filter 0.5s ease';
+  charEl.style.filter     = '';
+  await fcDelay(200);
+  if (dlgEl) { dlgEl.style.opacity = ''; dlgEl.style.pointerEvents = ''; }
+}
 
 /* ---- Phase 1: Spirit Host Intro ---- */
 async function fcPhase1_SpiritIntro() {
@@ -7217,6 +7717,12 @@ async function fcPhase3_SpiritShyIntro() {
   await fcLine('Spirit Guide', FC_COL.spirit, 'Looks like someone is hiding...');
   await fcLine('Spirit Guide', FC_COL.spirit, 'Can you help bring them out?');
   fcHideDlg();
+  /* Spirit steps back — she fades before the tapping begins */
+  fcSpiritPoint.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+  fcSpiritPoint.style.opacity    = '0';
+  fcSpiritPoint.style.transform  = 'translateX(-50%) translateY(16px)';
+  await fcDelay(400);
+  fcImgSpiritPoint.src = '';
 }
 
 /* ---- Phase 4: DS 3-tap Shy Reveal ---- */
@@ -7237,21 +7743,11 @@ async function fcPhase4_DSReveal() {
   var peeks   = ['translateX(-75%)', 'translateX(-50%)', 'translateX(-25%)'];
   var tapMsgs = ['Come on, tap again! (2/3)', 'Almost there! (3/3)'];
 
-  /* Spirit pointer hover positions for each tap */
-  var spiritTapMoves = [
-    'translateX(-50%) translateY(-7px) rotate(4deg)',
-    'translateX(-47%) translateY(-4px) rotate(-3deg)',
-    'translateX(-53%) translateY(-10px) rotate(5deg)',
-  ];
-
   await new Promise(function(resolve) {
     fcSpecialTap = function() {
       taps++;
       fcDS.style.transition = 'transform 0.5s cubic-bezier(.2,1.3,.4,1)';
       fcDS.style.transform  = peeks[taps - 1];
-      /* Spirit reacts — gentle hover shift on each encouragement tap */
-      fcSpiritPoint.style.transition = 'transform 0.38s cubic-bezier(.2,1.2,.4,1)';
-      fcSpiritPoint.style.transform  = spiritTapMoves[taps - 1];
       var rect = fcImgDS.getBoundingClientRect();
       fcSparkle(rect.right - 15, rect.top + rect.height * 0.35, '#ff80a0', 8);
       if (taps >= 3) {
@@ -7264,30 +7760,20 @@ async function fcPhase4_DSReveal() {
     };
   });
 
-  await fcDelay(200);
-  /* Spirit pointer settles then fades out — her guidance work is done */
-  fcSpiritPoint.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
-  fcSpiritPoint.style.transform  = 'translateX(-50%)';
-  fcSpiritPoint.style.opacity    = '0';
-  setTimeout(function() { fcImgSpiritPoint.src = ''; }, 500);
   fcDS.style.transition = 'transform 0.6s cubic-bezier(.2,1.3,.4,1)';
   fcDS.style.transform  = 'translateX(0)';
   await fcDelay(700);
 
   await fcSwapCharImg(fcImgDS, 'demonslayerwelcome.png');
-  await fcLine('Demon Slayer', FC_COL.ds, "...Oh! You actually came to get me? *blushes* Happy Birthday... I really mean it.");
+  await fcLine('Demon Slayer', FC_COL.ds, "...Oh! You actually came to get me? Happy Birthday... I really mean it.");
 
   await fcSwapCharImg(fcImgDS, 'demonslayerheart.png');
   fcFloatHearts(5);
   await fcLine('Demon Slayer', FC_COL.ds, "We're sending all our love to the birthday girl!");
 
-  /* Heart gift — DS */
-  await fcShowGiftUI(
-    fcDemonSlayerEl, 'rgba(180,60,255,.8)',
-    'Demon Slayer', FC_COL.ds,
-    "...Actually, would you be willing to spare a few hearts? We'll carry them with us always.",
-    "You've given everything already... *smiles warmly* That means more than you know."
-  );
+  /* Heart pop — DS (3 hearts) */
+  await fcShowHeartPop(fcDemonSlayerEl, 'rgba(180,60,255,.8)', 3,
+    '❤️ Pop the hearts to gift your love to the Demon Slayer Team!');
 
   await fcDSToStage();
   fcHideDlg();
@@ -7313,13 +7799,9 @@ async function fcPhase6_OPArrives() {
   fcFloatHearts(6);
   await fcLine('One Piece Crew', FC_COL.op, "Our love and wishes are always with the birthday girl!");
 
-  /* Heart gift — One Piece */
-  await fcShowGiftUI(
-    fcOnePieceEl, 'rgba(255,160,40,.8)',
-    'One Piece Crew', FC_COL.op,
-    "Before we sail off — could you spare a few hearts to fuel our voyage?",
-    "Your heart's already sailing with us — that's the greatest treasure of all!"
-  );
+  /* Heart pop — One Piece (3 hearts) */
+  await fcShowHeartPop(fcOnePieceEl, 'rgba(255,160,40,.8)', 3,
+    '❤️ Pop the hearts to send your wishes to the Straw Hat Pirates!');
 
   await fcOPToStage();
   fcHideDlg();
@@ -7444,20 +7926,17 @@ async function fcPhase10_GojoArrival() {
 
   /* Existing upside-down reveal sequence (unchanged) */
   await fcDelay(500);
-  await fcLine('Gojo Satoru', FC_COL.gojo, "*drops elegantly from above* Well well well... a birthday girl who cleared every level? Impressive.");
+  await fcLine('Gojo Satoru', FC_COL.gojo, "Well well well... a birthday girl who cleared every level? Impressive.");
 
   await fcSwapCharImg(fcImgGojo, 'gojoheart-Photoroom.png');
   fcFloatHearts(5);
   await fcLine('Gojo Satoru', FC_COL.gojo, "May every dream you have come true. Happy Birthday!");
-  await fcLine('Gojo Satoru', FC_COL.gojo, "Do not tell anyone I said that. I have a reputation to maintain. *grins*");
+  await fcLine('Gojo Satoru', FC_COL.gojo, "Do not tell anyone I said that. I have a reputation to maintain.");
+  await fcLine('Gojo Satoru', FC_COL.gojo, "Looks like there are still a couple of hearts waiting... I'll gladly protect them.");
 
-  /* Heart gift — Gojo */
-  await fcShowGiftUI(
-    fcGojoEl, 'rgba(80,200,255,.8)',
-    'Gojo Satoru', FC_COL.gojo,
-    "Mind if I borrow a few hearts too? Just to keep things interesting.",
-    "...You've already given it all. *quiet smile* That's very like you."
-  );
+  /* Heart pop — Gojo (2 hearts) */
+  await fcShowHeartPop(fcGojoEl, 'rgba(80,200,255,.8)', 2,
+    '❤️ Pop the hearts and let Gojo protect your wishes!');
 
   await fcGojoToStage();
   fcHideDlg();
@@ -7505,13 +7984,15 @@ async function fcPhase12_RengokuArrival() {
   fcFloatHearts(6);
   await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "HOW COULD ANYONE NOT ADORE HER? SHE'S ABSOLUTELY WONDERFUL!");
 
-  /* Heart gift — Rengoku */
-  await fcShowGiftUI(
-    fcRengokuEl, 'rgba(255,100,40,.8)',
-    'Rengoku Kyojuro', FC_COL.rengoku,
-    "I'VE COME TO COLLECT EVERY LAST BIT OF YOUR INFINITE LOVE! WOULD YOU HONOUR ME?!",
-    "YOUR HEART IS ALREADY FULLY COMMITTED! THAT FLAME BURNS MAGNIFICENTLY!"
-  );
+  await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "These final hearts shall burn brighter than any flame!");
+  await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "I'll keep them safe forever!");
+
+  /* Heart pop — Rengoku (2 hearts) */
+  await fcShowHeartPop(fcRengokuEl, 'rgba(255,100,40,.8)', 2,
+    '❤️ Pop the final hearts and let Rengoku carry them with his eternal flame!');
+
+  /* Infinite Heart Collection cinematic */
+  await fcShowRengokuInfiniteGift(fcRengokuEl);
 
   /* ── Step 3: Lovestruck — rengokuhearthandlarge ───────────────────────── */
   await fcSwapCharImg(fcImgRengoku, 'rengokuhearthandlarge.png');
@@ -7520,7 +8001,7 @@ async function fcPhase12_RengokuArrival() {
 
   /* ── Step 4: Final mini cute state — rengokuheart ────────────────────── */
   await fcSwapCharImg(fcImgRengoku, 'rengokuheart.png');
-  await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "...I HAVE OFFICIALLY TURNED INTO A KID.");
+  await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "...I HAVE FALLEN FOR YOUR KINDNESS AND SMILE.");
 
   /* ── Step 5: Return to hearthand — warm final reveal ─────────────────── */
   await fcSwapCharImg(fcImgRengoku, 'rengokuhearthandlarge.png');
@@ -7623,9 +8104,24 @@ async function fcPhase16_Creator() {
     "With love,\nYour Creator ✨";
 
   fcCreator.classList.add('fc-show');
-  await fcWaitTap();
+  /* Show Continue button, wait for tap */
+  await fcDelay(600);  /* let card fully fade in first */
+  var cBtn = document.getElementById('fcCreatorContinueBtn');
+  if (cBtn) { cBtn.classList.add('gl-show'); }
+  await new Promise(function(resolve) {
+    if (!cBtn) { fcWaitTap().then(resolve); return; }
+    var _done = false;
+    function go(e) {
+      if (_done) return; _done = true;
+      if (e && e.cancelable) e.preventDefault();
+      cBtn.classList.remove('gl-show');
+      setTimeout(resolve, 350);
+    }
+    cBtn.addEventListener('click',    go, { once: true });
+    cBtn.addEventListener('touchend', go, { once: true, passive: false });
+  });
   fcCreator.classList.remove('fc-show');
-  await fcDelay(600);
+  await fcDelay(700);
 }
 
 /* ---- Phase 17: Ending ---- */
@@ -7634,9 +8130,21 @@ async function fcPhase17_Ending() {
   fcBg('#000');
   await fcDelay(800);
   fcEnding.classList.add('fc-show');
-  await fcDelay(5000);
+  /* Wait for Close Journey button */
+  await new Promise(function(resolve) {
+    var btn = document.getElementById('fcCloseJourneyBtn');
+    if (!btn) { setTimeout(resolve, 6000); return; }
+    var _done = false;
+    function go(e) {
+      if (_done) return; _done = true;
+      if (e && e.cancelable) e.preventDefault();
+      resolve();
+    }
+    btn.addEventListener('click',    go, { once: true });
+    btn.addEventListener('touchend', go, { once: true, passive: false });
+  });
   fcEnding.classList.remove('fc-show');
-  await fcDelay(800);
+  await fcDelay(900);
   location.reload();
 }
 
