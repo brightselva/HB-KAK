@@ -1755,6 +1755,7 @@
       width: 54px;
       height: 54px;
       user-select: none;
+      will-change: transform, opacity;
       filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .45));
       will-change: transform
     }
@@ -2093,7 +2094,7 @@
       top: 0;
       width: 64px;
       height: 64px;
-      will-change: transform;
+      will-change: transform, opacity;
       filter: drop-shadow(0 0 10px rgba(255, 236, 170, .95)) drop-shadow(0 3px 5px rgba(0, 0, 0, .45)) saturate(1.35) brightness(1.14)
     }
 
@@ -2792,6 +2793,7 @@
   position: absolute;
   pointer-events: none;
   opacity: 0;
+  will-change: transform, opacity;   /* promote to GPU compositor layer */
 }
 
 /* Default anchor positions — JS may override per scene */
@@ -2810,7 +2812,7 @@
 /* Spirit Guide: centred, floats above the dialogue box          z-index 16 */
 #fcSpirit     { left: 50%; bottom: clamp(118px, 20vh, 172px); transform: translateX(-50%); z-index: 16; }
 /* Spirit Point: same anchor as Spirit                           z-index 16 */
-#fcSpiritPoint{ left: 50%; bottom: clamp(118px, 20vh, 172px); transform: translateX(-50%); z-index: 16;
+#fcSpiritPoint{ left: 50%; bottom: clamp(70px, 8vh, 172px); transform: translateX(-50%); z-index: 16;
                 position: absolute; pointer-events: none; opacity: 0; }
 
 /* ── Independent image sizing rules ─────────────────────────────────────── */
@@ -4984,7 +4986,7 @@ Now it's time for the part everyone has been waiting for.`
     }
     function updateGame1(now) {
       if (!g1.running) return;
-      const dt = Math.min(0.05, (now - g1.last) / 1000); g1.last = now;
+      const dt = Math.min(MOBILE ? 0.033 : 0.05, (now - g1.last) / 1000); g1.last = now;
       if (now - g1.lastSpawn > g1.spawnGap) { spawnItem(); g1.lastSpawn = now; g1.spawnGap = Math.max(520, g1.spawnGap - 7); }
       const H = window.innerHeight;
       for (let k = g1.items.length - 1; k >= 0; k--) {
@@ -5722,8 +5724,8 @@ Now it's time for the part everyone has been waiting for.`
     function updateGame3(now) {
       if (!g3.running) return;
       const dt = Math.min(0.033, (now - g3.last) / 1000); g3.last = now;
-      // sakura + steam ambience
-      if (Math.random() < dt * 2.2) spawnSakura();
+      // sakura + steam ambience (halve spawn rate on mobile to reduce DOM churn)
+      if (Math.random() < dt * (MOBILE ? 1.1 : 2.2)) spawnSakura();
       g3.steamT += dt;
       const steamRate = 0.45 - g3.count * 0.025;            // thicker steam as it cooks, but optimized (from 0.45s down to 0.225s)
       if (g3.steamT > steamRate) { g3.steamT = 0; steamPuff(g3.steam, 36 + Math.random() * 36, 0.5 + g3.count / 12); }
@@ -6080,7 +6082,7 @@ Now it's time for the part everyone has been waiting for.`
     }
     function confettiBurst() {
       const cols = ['#ff5d7a', '#ffd23c', '#36c46a', '#2f9bff', '#9b6bff', '#ff9e57', '#ff85c0', '#80ffcc'];
-      for (let i = 0; i < 160; i++) {
+      for (let i = 0; i < 100; i++) {
         const c = document.createElement('div'); c.className = 'confetti';
         c.style.background = cols[i % cols.length];
         c.style.left = Math.random() * 100 + '%'; c.style.top = '-30px';
@@ -6547,6 +6549,33 @@ function fcHandleTap() {
   if (fcTapResolve) { const r = fcTapResolve; fcTapResolve = null; r(); }
 }
 
+/* ---- Level 4 image preloader ---- */
+var _fcImgsPreloaded = false;
+function fcPreloadL4Images() {
+  if (_fcImgsPreloaded) return;
+  _fcImgsPreloaded = true;
+  var imgs = [
+    /* Spirit */
+    'spiritgreeting.png','spirit.png','spirittapview.png','spirituppoint.png','spiritheart.png',
+    /* Naruto */
+    'naruto.png','narutoheart.png','narutohiss.png','thumbsupnaruto.png',
+    /* Gojo */
+    'gojowaving.png','gojopeeking-Photoroom.png','gojoheart-Photoroom.png',
+    /* Rengoku */
+    'rengoku.png','rengokuwavelarge.png','rengokuheartlarge.png',
+    'rengokuhearthandlarge.png','rengokuheart.png',
+    /* Demon Slayer */
+    'demonslayer.png','demonslayerwelcome.png','demonslayerheart.png',
+    'demonslayerrightview.png','demonslayrupview.png',
+    /* One Piece */
+    'onepiece.png','onepieceheart-Photoroom.png','onepiecerightside-Photoroom.png'
+  ];
+  imgs.forEach(function(src) {
+    var img = new Image();
+    img.src = src;
+  });
+}
+
 function fcTypewriter(el, text, speed) {
   speed = speed || 28;
   el.textContent = '';
@@ -6714,11 +6743,20 @@ function fcEnterSpirit(src) {
 
 /* ---- Character image swap helper ---- */
 function fcSwapCharImg(imgEl, src) {
-  imgEl.style.transition = 'opacity 0.25s ease';
+  /* Fade out, swap src, double-rAF ensures decode before fade-in (no flash) */
+  imgEl.style.transition = 'opacity 0.28s ease';
   imgEl.style.opacity    = '0';
-  return new Promise(function(r){ setTimeout(function(){
-    imgEl.src = src; imgEl.style.opacity = '1'; r();
-  }, 280); });
+  return new Promise(function(resolve) {
+    setTimeout(function() {
+      imgEl.src = src;
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          imgEl.style.opacity = '1';
+          setTimeout(resolve, 310);
+        });
+      });
+    }, 300);
+  });
 }
 
 /* ---- Stage transition helpers (move to party position after intro) ---- */
@@ -6732,7 +6770,7 @@ function fcNarutoToStage() {
 function fcDSToStage() {
   /* Lift DS up slightly to expose Rengoku below */
   fcDS.style.transition = 'bottom 0.7s ease';
-  fcDS.style.bottom     = 'clamp(115px,16vh,155px)';
+  fcDS.style.bottom     = 'clamp(115px,12vh,155px)';
   return fcDelay(750);
 }
 
@@ -6840,6 +6878,9 @@ function fcShake() {
 function fcBg(grad) { fcBgTint.style.background = grad; }
 
 /* ==================== 17-PHASE LIVING BIRTHDAY PARTY ==================== */
+
+/* Kick off background preload of all Level 4 character images */
+fcPreloadL4Images();
 
 /* ---- Phase 1: Spirit Host Intro ---- */
 async function fcPhase1_SpiritIntro() {
@@ -7113,7 +7154,7 @@ async function fcPhase10_GojoArrival() {
 
   /* Restore DS position and image simultaneously */
   fcDS.style.transition = 'bottom 0.6s ease';
-  fcDS.style.bottom     = 'clamp(115px,16vh,155px)';
+  fcDS.style.bottom     = 'clamp(115px,12vh,155px)';
   fcSwapCharImg(fcImgDS, 'demonslayerheart.png');
   await fcSwapCharImg(fcImgGojo, 'gojopeeking-Photoroom.png');
   /* ── END new section ──────────────────────────────────────────────────── */
@@ -7182,6 +7223,9 @@ async function fcPhase12_RengokuArrival() {
   await fcSwapCharImg(fcImgRengoku, 'rengokuheart.png');
   await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "...I HAVE OFFICIALLY TURNED INTO A KID.");
 
+  /* ── Step 5: Return to hearthand — warm final reveal ─────────────────── */
+  await fcSwapCharImg(fcImgRengoku, 'rengokuhearthandlarge.png');
+
   await fcRengokuToStage();
   fcHideDlg();
 }
@@ -7197,9 +7241,9 @@ async function fcPhase13_RengokuHeart() {
 
 /* ---- Phase 14: Grand Group Photo ---- */
 async function fcPhase14_GroupPhoto() {
-  /* Rengoku is the bottom-centre hero — stays in place, rises above all other characters */
-  fcRengokuEl.style.zIndex = '9999';
-  fcGojoEl.style.zIndex    = '22';
+  /* Rengoku at z-19 — above all characters, below dialogue (z-20) so text stays readable */
+  fcRengokuEl.style.zIndex = '19';
+  fcGojoEl.style.zIndex    = '11';
 
   fcBg('radial-gradient(ellipse at center, #100020 0%, #020010 100%)');
 
