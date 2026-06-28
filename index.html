@@ -6,6 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Adventure Map — Journey of Four Chapters</title>
   <style>
+    @font-face {
+      font-family: 'Parisienne';
+      src: url('Parisienne-Regular.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+
+
     :root {
       --blue: #2f9bff;
       --blue-d: #1769c9;
@@ -2352,7 +2361,7 @@
     #naruImgWrap {
       position: absolute;
       left: 0;
-      bottom: 0;
+      bottom: 10%;
       width: clamp(120px, 22vw, 280px);
       transform: translateX(-110%);
       transition: transform .7s cubic-bezier(.2, 1.2, .4, 1);
@@ -3503,38 +3512,180 @@
       cursor: pointer;
     }
 
-    /* ── Creator Continue button ───────────────────────────────────────────── */
+    /* ── Creator tap hint (hidden — legacy) ────────────────────────────────── */
     .fc-creator-tap {
       display: none;
     }
 
-    /* hide old tap hint */
-    #fcCreatorContinueBtn {
+    /* ── Creator Swipe Slider ────────────────────────────────────────────────
+       Scoped to #fcSwipeSlider — zero global side-effects.                    */
+    #fcSwipeSlider {
+      position: relative;
+      width: clamp(240px, 70vw, 320px);
+      height: 56px;
+      border-radius: 28px;
+      background: linear-gradient(90deg,
+          rgba(139, 62, 211, 0.42) 0%,
+          rgba(219, 39, 119, 0.32) 100%);
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
       margin-top: clamp(18px, 4vh, 32px);
-      background: linear-gradient(135deg, #7c3aed, #4f46e5);
-      color: #fff;
-      border: none;
-      border-radius: 50px;
-      padding: clamp(10px, 1.8vh, 15px) clamp(22px, 5vw, 36px);
-      font-size: clamp(13px, 2.8vw, 16px);
-      font-weight: 700;
-      cursor: pointer;
-      letter-spacing: 0.5px;
-      box-shadow: 0 4px 20px rgba(124, 58, 237, .4);
+      overflow: hidden;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.5s ease, transform 0.15s ease;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
+      transition: opacity 0.5s ease;
+      box-shadow: 0 4px 24px rgba(124, 58, 237, 0.25),
+        inset 0 0 18px rgba(255, 100, 160, 0.12);
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      flex-shrink: 0;
     }
 
-    #fcCreatorContinueBtn.gl-show {
+    #fcSwipeSlider.sl-show {
       opacity: 1;
       pointer-events: auto;
     }
 
-    #fcCreatorContinueBtn:active {
-      transform: scale(0.95);
+    #fcSwipeThumb {
+      position: absolute;
+      left: 4px;
+      top: 4px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 38% 34%, #fff 35%, rgba(255, 180, 210, 0.9) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      line-height: 1;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.28), 0 0 0 2px rgba(255, 255, 255, 0.35);
+      will-change: transform;
+      cursor: grab;
+      z-index: 2;
+      transform: translate3d(0, 0, 0);
+    }
+
+    #fcSwipeLabel {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(12px, 2.8vw, 14px);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: rgba(255, 255, 255, 0.85);
+      text-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+      z-index: 1;
+      transition: opacity 0.2s ease;
+    }
+
+    /* ── Infinite Heart Overlay (post-swipe, inside creator card) ─────────── */
+    #fcInfHeartWrap {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 10, 0.93);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.55s ease;
+      z-index: 2;
+    }
+
+    #fcInfHeartWrap.ih-show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #fcInfHeart {
+      position: relative;
+      width: clamp(120px, 32vw, 155px);
+      height: clamp(120px, 32vw, 155px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      animation: ihPulse 1.9s ease-in-out infinite;
+    }
+
+    #fcInfHeart svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 0 18px rgba(255, 80, 120, 0.85)) drop-shadow(0 0 42px rgba(200, 40, 80, 0.5));
+    }
+
+    #fcInfHeart .ih-inf {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -46%);
+      font-size: clamp(28px, 7.5vw, 42px);
+      font-weight: 900;
+      color: rgba(255, 225, 235, 0.97);
+      text-shadow: 0 0 10px rgba(255, 80, 120, 0.9), 0 0 3px #fff;
+      pointer-events: none;
+      line-height: 1;
+    }
+
+    #fcTapHint {
+      font-size: clamp(12px, 3vw, 15px);
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.72);
+      letter-spacing: 0.5px;
+      text-shadow: 0 0 10px rgba(255, 80, 120, 0.5);
+    }
+
+    @keyframes ihPulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.07);
+      }
+    }
+
+    /* ── Tiny heart burst (fixed-position, appended to body) ─────────────── */
+    .fc-tiny-heart {
+      position: fixed;
+      pointer-events: none;
+      z-index: 99999;
+      width: 18px;
+      height: 18px;
+      will-change: transform, opacity;
+      animation: fcTinyFly var(--fth-dur, 580ms) ease-out forwards;
+    }
+
+    .fc-tiny-heart svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 0 5px rgba(255, 80, 120, 0.9));
+    }
+
+    @keyframes fcTinyFly {
+      0% {
+        transform: translate3d(0, 0, 0) scale(1);
+        opacity: 1;
+      }
+
+      55% {
+        opacity: 0.85;
+      }
+
+      100% {
+        transform: translate3d(var(--fth-tx), var(--fth-ty), 0) scale(0.3);
+        opacity: 0;
+      }
     }
 
     /* ── Ending overrides ──────────────────────────────────────────────────── */
@@ -3732,7 +3883,7 @@
 <body>
   <!-- ── Game Loading Screen ── -->
   <div id="gameLoader" aria-label="Loading birthday adventure">
-    <div id="glTitle">Happy Birthday!</div>
+    <div id="glTitle" style="font-family: Georgia, 'Times New Roman', Times, serif;">Happy Birthday!</div>
     <div id="glSub">Loading Birthday Adventure…</div>
     <div id="glBarWrap">
       <div id="glProgress"></div>
@@ -3837,7 +3988,8 @@
           </svg>
         </div>
 
-        <div id="introTitle">Happy Birthday!</div>
+        <div id="introTitle" style="font-family: Georgia, 'Times New Roman', Times, serif;">
+          Happy Birthday</div>
 
         <div class="intro-ribbon">
           <span></span>
@@ -3896,7 +4048,7 @@
     <!-- CAKE BLOWING (Level 4) -->
     <div class="overlay" id="game4">
       <!-- Ambient sparkles injected by JS -->
-      <div id="g4Title">✨ Make A Birthday Wish ✨</div>
+      <div id="g4Title" style="font-family: 'Parisienne', cursive;">✨ Make A Birthday Wish ✨</div>
       <div id="g4Subtitle">Every candle holds a wish — tap them gently and let your dreams shine a little brighter</div>
       <div id="g4ProgressWrap">
         <div id="g4ProgressFill"></div>
@@ -4150,7 +4302,8 @@
       <div id="g4TapHint">Tap each candle to make a wish</div>
       <!-- Finale overlay -->
       <div id="g4Finale">
-        <div id="g4FinaleText">HAPPY BIRTHDAY</div>
+        <div id="g4FinaleText" style="font-family: Georgia, 'Times New Roman', Times, serif;">
+          HAPPY BIRTHDAY</div>
         <!-- <div id="g4FinaleYear">✨ 22 Years Young ✨</div> -->
         <div id="g4FinaleMsg">
           May your smile stay as bright as today,<br>
@@ -4323,11 +4476,23 @@
         </div>
       </div>
       <div id="fcCreatorCard">
-        <img src="surprise.webp" alt="">
-        <h2>A Message from the Creator ✨</h2>
+        <!-- <img src="surprise.webp" alt=""> -->
+        <h2 style="font-family: 'Parisienne', cursive;">
+          A Message from the Creator ✨</h2>
         <p id="fcCreatorMsg"></p>
         <div class="fc-creator-tap">Tap to continue</div>
-        <button id="fcCreatorContinueBtn">Continue →</button>
+        <!-- Swipe-to-continue slider (replaces old Continue button) -->
+        <div id="fcSwipeSlider">
+          <div id="fcSwipeThumb">❤️</div>
+          <span id="fcSwipeLabel">Slide to continue →</span>
+        </div>
+        <!-- Infinite heart overlay — shown after successful swipe -->
+        <div id="fcInfHeartWrap">
+          <div id="fcInfHeart">
+            <!-- SVG heart populated by JS to match codebase heart style -->
+          </div>
+          <div id="fcTapHint">Tap the Infinite Heart</div>
+        </div>
       </div>
       <div id="fcEnding">
         <h2>Thanks for celebrating this birthday with us ❤️</h2>
@@ -8601,7 +8766,7 @@ Now it's time for the part everyone has been waiting for.`
           fcEnterNaruto('narutopeeking.webp');
           await fcDelay(800);
 
-          await fcLine('Naruto', FC_COL.naruto, 'Happy Birthday!');
+          await fcLine('Naruto', FC_COL.naruto, 'Happy Birthday Kavyaa!');
           await fcLine('Naruto', FC_COL.naruto, "I couldn't miss this special day!");
 
           await fcSwapCharImg(fcImgNaruto, 'thumbsupnaruto.webp');
@@ -8684,7 +8849,7 @@ Now it's time for the part everyone has been waiting for.`
 
           /* Heart pop — DS (3 hearts) */
           await fcShowHeartPop(fcDemonSlayerEl, 'rgba(180,60,255,.8)', 3,
-            '❤️ Pop the hearts to gift your love to the Demon Slayer Team!');
+            '❤️ Pop the hearts to gift your love to the Demon Slayers!');
 
           await fcDSToStage();
           fcHideDlg();
@@ -8695,6 +8860,7 @@ Now it's time for the part everyone has been waiting for.`
           await fcSwapCharImg(fcImgNaruto, 'narutowaving.webp');
           await fcLine('Naruto', FC_COL.naruto, 'See?');
           await fcLine('Naruto', FC_COL.naruto, "I told you everyone wanted to come!");
+          await fcSwapCharImg(fcImgNaruto, 'narutoheart.webp');
           fcHideDlg();
         }
 
@@ -8704,11 +8870,11 @@ Now it's time for the part everyone has been waiting for.`
           fcEnterOP('onepiecewelcome-Photoroom.webp');
           await fcDelay(800);
 
-          await fcLine('One Piece Crew', FC_COL.op, "YOHOHOHO! We sailed all four seas to be here — Happy Birthday!!");
+          await fcLine('One Piece Crew', FC_COL.op, "YOHOHOHO! We sailed all four seas to be here — Happy Birthday Kavyaa!!");
 
           await fcSwapCharImg(fcImgOP, 'onepieceheart-Photoroom.webp');
           fcFloatHearts(6);
-          await fcLine('One Piece Crew', FC_COL.op, "Our love and wishes are always with the birthday girl!");
+          await fcLine('One Piece Crew', FC_COL.op, "Our love and wishes are always with you!");
 
           /* Heart pop — One Piece (3 hearts) */
           await fcShowHeartPop(fcOnePieceEl, 'rgba(255,160,40,.8)', 3,
@@ -8736,7 +8902,8 @@ Now it's time for the part everyone has been waiting for.`
 
         /* ---- Phase 8: Naruto Breaks the Argument ---- */
         async function fcPhase8_NarutoBreaks() {
-          fcBounce(fcImgNaruto);
+          // fcBounce(fcImgNaruto);
+          await fcSwapCharImg(fcImgNaruto, 'narutohiss.webp');
           await fcDelay(200);
           await fcLine('Naruto', FC_COL.naruto, 'HEY!');
           fcBounce(fcImgNaruto);
@@ -8809,7 +8976,7 @@ Now it's time for the part everyone has been waiting for.`
           fcBounce(fcImgGojo);
           await fcDelay(200);
 
-          await fcLine('Gojo Satoru', FC_COL.gojo, "Happy Birthday! I couldn't let a day this special pass without seeing you.");
+          await fcLine('Gojo Satoru', FC_COL.gojo, "I couldn't let a day this special pass without seeing you.");
           await fcLine('Gojo Satoru', FC_COL.gojo, "Looking this gorgeous on your birthday? You're making it pretty hard for me to keep my cool.");
 
           /* Lower DS so they look like they are standing at ground level looking up */
@@ -8837,11 +9004,11 @@ Now it's time for the part everyone has been waiting for.`
 
           /* Existing upside-down reveal sequence (unchanged) */
           await fcDelay(500);
-          await fcLine('Gojo Satoru', FC_COL.gojo, "Well well well... a birthday girl who cleared every level? Impressive.");
+          await fcLine('Gojo Satoru', FC_COL.gojo, "Well well well... a birthday girl who cleared every level? Impressive kavyaa.");
 
           await fcSwapCharImg(fcImgGojo, 'gojoheart-Photoroom.webp');
           fcFloatHearts(5);
-          await fcLine('Gojo Satoru', FC_COL.gojo, "Happy Birthday! Careful with that smile... it's dangerously charming. May every dream you have come true.");
+          await fcLine('Gojo Satoru', FC_COL.gojo, "Happy Birthday kavyaa! Careful with that smile... it's dangerously charming. May every dream you have come true.");
           await fcLine('Gojo Satoru', FC_COL.gojo, "Do not tell anyone I said that. I have a reputation to maintain.");
           await fcLine('Gojo Satoru', FC_COL.gojo, "Looks like there are still a couple of hearts waiting... I'll gladly protect them.");
 
@@ -8894,7 +9061,7 @@ Now it's time for the part everyone has been waiting for.`
           await fcSwapCharImg(fcImgRengoku, 'rengokuheartlarge.webp');
           fcFloatHearts(6);
           await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "HOW COULD ANYONE MISS THE PARTY? SHE'S SO ADORABLE AND ABSOLUTELY WONDERFUL!");
-          await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "HAPPY BIRTHDAY! LIVE EACH DAY WITH PASSION, TREASURE EVERY SMILE, AND NEVER FORGET HOW WONDERFUL YOU ARE!");
+          await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "HAPPY BIRTHDAY KAVYAA! LIVE EACH DAY WITH PASSION, TREASURE EVERY SMILE, AND NEVER FORGET HOW WONDERFUL YOU ARE!");
           await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "These final hearts shall burn brighter than any flame!");
           await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "I'll keep them safe forever!");
 
@@ -8925,7 +9092,7 @@ Now it's time for the part everyone has been waiting for.`
         async function fcPhase13_RengokuHeart() {
           /* Rengoku character already shows rengokuheart.webp (entered in Phase 12). */
           await fcDelay(400);
-          await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "HAPPY BIRTHDAY! I SINCERELY HOPE EVERY DAY OF YOUR LIFE SHINES WITH WARMTH AND MEANING!");
+          await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "HAPPY BIRTHDAY KAVYAA! I SINCERELY HOPE EVERY DAY OF YOUR LIFE SHINES WITH WARMTH AND MEANING!");
           fcFloatHearts(8);
           fcHideDlg();
         }
@@ -8982,7 +9149,7 @@ Now it's time for the part everyone has been waiting for.`
           await fcDelay(400);
           fcFloatHearts(12);
 
-          await fcLine('All Together', '#ffffff', "HAPPY BIRTHDAY!");
+          await fcLine('All Together', '#ffffff', "HAPPY BIRTHDAY KAVYAA!");
           await fcLine('All Together', '#ffffff', "Let this be your promise from all of us—may your journey shine with happiness, your heart stay full of love, and your dreams never stop growing. You are cherished beyond measure.");
 
           fcFloatHearts(16);
@@ -8992,6 +9159,201 @@ Now it's time for the part everyone has been waiting for.`
           fcHideDlg();
           await fcDelay(600);
         }
+
+        /* ================================================================
+           fcCreatorSwipeInteraction
+           Self-contained swipe-slider + infinite-heart tap for Phase 16.
+           Touches ONLY: #fcSwipeSlider, #fcSwipeThumb, #fcSwipeLabel,
+                         #fcInfHeartWrap, #fcInfHeart, #fcTapHint.
+           No global state modified. Resolves when burst completes.
+           ================================================================ */
+        function fcCreatorSwipeInteraction() {
+          return new Promise(function (resolve) {
+            var slider = document.getElementById('fcSwipeSlider');
+            var thumb = document.getElementById('fcSwipeThumb');
+            var label = document.getElementById('fcSwipeLabel');
+            var wrap = document.getElementById('fcInfHeartWrap');
+            var infEl = document.getElementById('fcInfHeart');
+            var hint = document.getElementById('fcTapHint');
+
+            /* ── Build SVG heart inside #fcInfHeart (matches codebase style) ── */
+            var uid3 = 'ih_' + Date.now();
+            infEl.innerHTML =
+              '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 42 42">' +
+              '<defs><radialGradient id="' + uid3 + '" cx="40%" cy="30%" r="65%">' +
+              '<stop offset="0" stop-color="#ff8fa3"/>' +
+              '<stop offset="1" stop-color="#d4003a"/>' +
+              '</radialGradient></defs>' +
+              '<path d="M21 36C21 36 4 25 4 13.5C4 8 8 4 13 4C16.5 4 19.5 6.2 21 9' +
+              'C22.5 6.2 25.5 4 29 4C34 4 38 8 38 13.5C38 25 21 36 21 36Z"' +
+              ' fill="url(#' + uid3 + ')" stroke="#a0002e" stroke-width="1.2"/>' +
+              '<ellipse cx="15" cy="12" rx="3.5" ry="5" fill="rgba(255,255,255,.38)" transform="rotate(-20,15,12)"/>' +
+              '</svg>' +
+              '<span class="ih-inf">&#x221e;</span>';
+
+            /* ── Slider state ─────────────────────────────────────────────── */
+            var THUMB_W = 48;   /* matches CSS width */
+            var PAD = 4;    /* matches CSS left:4px */
+            var isDragging = false;
+            var dragOrigin = 0;  /* clientX at drag start minus current translate */
+            var curX = 0;    /* current translate value */
+
+            function maxX() {
+              return Math.max(0, slider.offsetWidth - THUMB_W - PAD * 2);
+            }
+
+            function setThumb(x, instant) {
+              curX = Math.max(0, Math.min(x, maxX()));
+              if (!instant) {
+                thumb.style.transition = 'none';
+                label.style.transition = 'none';
+              }
+              thumb.style.transform = 'translate3d(' + curX + 'px,0,0)';
+              /* Fade label as thumb moves right */
+              label.style.opacity = String(Math.max(0, 1 - (curX / maxX()) * 0.95));
+            }
+
+            /* ── Show slider ──────────────────────────────────────────────── */
+            slider.classList.add('sl-show');
+
+            /* ── Drag start ───────────────────────────────────────────────── */
+            function onStart(e) {
+              if (isDragging) return;
+              isDragging = true;
+              var pt = e.touches ? e.touches[0] : e;
+              dragOrigin = pt.clientX - curX;
+              thumb.style.transition = 'none';
+              label.style.transition = 'none';
+              e.preventDefault();
+            }
+
+            /* ── Drag move ────────────────────────────────────────────────── */
+            function onMove(e) {
+              if (!isDragging) return;
+              var pt = e.touches ? e.touches[0] : e;
+              setThumb(pt.clientX - dragOrigin, true);
+              e.preventDefault();
+            }
+
+            /* ── Drag end ─────────────────────────────────────────────────── */
+            function onEnd() {
+              if (!isDragging) return;
+              isDragging = false;
+              var mx = maxX();
+              if (mx > 0 && curX >= mx * 0.9) {
+                /* SUCCESS ─ glide thumb to centre, fade slider, show heart */
+                var centre = (slider.offsetWidth - THUMB_W - PAD * 2) / 2;
+                thumb.style.transition = 'transform 0.3s cubic-bezier(.2,1.1,.4,1)';
+                thumb.style.transform = 'translate3d(' + centre + 'px,0,0)';
+                label.style.transition = 'opacity 0.25s ease';
+                label.style.opacity = '0';
+                setTimeout(function () {
+                  slider.style.transition = 'opacity 0.4s ease';
+                  slider.style.opacity = '0';
+                  setTimeout(showInfHeart, 400);
+                }, 290);
+              } else {
+                /* FAIL ─ spring back */
+                thumb.style.transition = 'transform 0.45s cubic-bezier(.2,1.25,.4,1)';
+                label.style.transition = 'opacity 0.35s ease';
+                thumb.style.transform = 'translate3d(0,0,0)';
+                label.style.opacity = '1';
+                curX = 0;
+              }
+            }
+
+            /* ── Attach drag listeners ────────────────────────────────────── */
+            thumb.addEventListener('touchstart', onStart, { passive: false });
+            document.addEventListener('touchmove', onMove, { passive: false });
+            document.addEventListener('touchend', onEnd, { passive: false });
+            thumb.addEventListener('mousedown', onStart);
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onEnd);
+
+            function removeDragListeners() {
+              thumb.removeEventListener('touchstart', onStart);
+              document.removeEventListener('touchmove', onMove);
+              document.removeEventListener('touchend', onEnd);
+              thumb.removeEventListener('mousedown', onStart);
+              document.removeEventListener('mousemove', onMove);
+              document.removeEventListener('mouseup', onEnd);
+            }
+
+            /* ── Show infinite heart (called after slider fades) ──────────── */
+            function showInfHeart() {
+              slider.style.display = 'none';
+              wrap.classList.add('ih-show');
+
+              function onHeartTap(e) {
+                if (e && e.cancelable) e.preventDefault();
+                infEl.removeEventListener('click', onHeartTap);
+                infEl.removeEventListener('touchend', onHeartTap);
+
+                /* Pop: pause pulse, scale up */
+                infEl.style.animation = 'none';
+                infEl.style.transition = 'transform 0.15s ease';
+                infEl.style.transform = 'scale(1.28)';
+
+                setTimeout(function () {
+                  /* Burst tiny hearts outward */
+                  burstHearts();
+                  /* Collapse heart + fade wrap */
+                  infEl.style.transition = 'transform 0.25s ease, opacity 0.3s ease';
+                  infEl.style.transform = 'scale(0.35)';
+                  infEl.style.opacity = '0';
+                  hint.style.transition = 'opacity 0.25s ease';
+                  hint.style.opacity = '0';
+                  wrap.style.transition = 'opacity 0.4s ease 0.2s';
+                  wrap.style.opacity = '0';
+                  setTimeout(function () {
+                    removeDragListeners();
+                    resolve();
+                  }, 680);
+                }, 160);
+              }
+
+              infEl.addEventListener('click', onHeartTap, { once: true });
+              infEl.addEventListener('touchend', onHeartTap, { once: true, passive: false });
+            }
+
+            /* ── Burst: 24 tiny SVG hearts fly outward then fade ──────────── */
+            function burstHearts() {
+              var rect = infEl.getBoundingClientRect();
+              var cx = rect.left + rect.width / 2;
+              var cy = rect.top + rect.height / 2;
+              var N = 24;
+              for (var i = 0; i < N; i++) {
+                (function (idx) {
+                  var uid4 = 'th_' + Date.now() + '_' + idx;
+                  var angle = (idx / N) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
+                  var dist = 70 + Math.random() * 110;
+                  var tx = Math.cos(angle) * dist;
+                  var ty = Math.sin(angle) * dist;
+                  var dur = 480 + Math.random() * 180;
+                  var el = document.createElement('span');
+                  el.className = 'fc-tiny-heart';
+                  el.style.cssText =
+                    'left:' + (cx - 9) + 'px;' +
+                    'top:' + (cy - 9) + 'px;' +
+                    '--fth-tx:' + tx.toFixed(1) + 'px;' +
+                    '--fth-ty:' + ty.toFixed(1) + 'px;' +
+                    '--fth-dur:' + dur.toFixed(0) + 'ms;';
+                  el.innerHTML =
+                    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 42 42">' +
+                    '<defs><radialGradient id="' + uid4 + '" cx="40%" cy="30%" r="65%">' +
+                    '<stop offset="0" stop-color="#ff8fa3"/>' +
+                    '<stop offset="1" stop-color="#d4003a"/>' +
+                    '</radialGradient></defs>' +
+                    '<path d="M21 36C21 36 4 25 4 13.5C4 8 8 4 13 4C16.5 4 19.5 6.2 21 9' +
+                    'C22.5 6.2 25.5 4 29 4C34 4 38 8 38 13.5C38 25 21 36 21 36Z"' +
+                    ' fill="url(#' + uid4 + ')"/></svg>';
+                  document.body.appendChild(el);
+                  setTimeout(function () { try { el.remove(); } catch (_) { } }, dur + 60);
+                })(i);
+              }
+            }
+          }); /* end Promise */
+        } /* end fcCreatorSwipeInteraction */
 
         /* ---- Phase 16: Creator Message ---- */
         async function fcPhase16_Creator() {
@@ -9006,42 +9368,28 @@ Now it's time for the part everyone has been waiting for.`
           });
           await fcDelay(1300);
 
-          fcCreMsg.textContent =
-            "You made it through every level — every puzzle, every game, every challenge.\n\n" +
-            "This little adventure was made with so much love, just for you.\n\n" +
-            "Thank you for being the kind of person who lights up every room, " +
-            "who laughs through the hard parts, and who inspires everyone around them.\n\n" +
-            "Wishing you a birthday as bright as your spirit — today and always.\n\n" +
-            "With love,\nYour Creator ✨";
-
           // fcCreMsg.textContent =
-          //   "Happy Birthday, Kavyaa ✨\n\n" +
-          //   "Some people are remembered for what they do, but some are cherished simply for who they are. " +
-          //   "You have a kind heart, a gentle soul, and the rare ability to care deeply for the people and the world around you. That's something I truly admire.\n\n" +
-          //   "I hope you never lose that beautiful empathy, even though it means you feel things more deeply than most.\n\n" +
-          //   "And I hope there are countless moments this year that make 'Evergreen' play in your mind—not because you're holding onto memories, but because you're creating new ones that make you smile.\n\n" +
-          //   "May this birthday bring you peace, laughter, unforgettable adventures, and every happiness you deserve. Keep smiling, keep being yourself, and keep making the world a little brighter just by being in it.\n\n" +
-          //   "Happy Birthday, Kavyaa. Wishing you a year as beautiful and genuine as your heart. ❤️\n\n" +
-          //   "— The Creator";
+          //   "You made it through every level — every puzzle, every game, every challenge.\n\n" +
+          //   "This little adventure was made with so much love, just for you.\n\n" +
+          //   "Thank you for being the kind of person who lights up every room, " +
+          //   "who laughs through the hard parts, and who inspires everyone around them.\n\n" +
+          //   "Wishing you a birthday as bright as your spirit — today and always.\n\n" +
+          //   "With love,\nYour Creator ✨";
+
+          fcCreMsg.innerHTML =
+            "Happy Birthday, Kavyaa ✨<br><br>" +
+            "Some people are remembered for what they do, but some are cherished simply for who they are. " +
+            "You have a kind heart, a gentle soul, and the rare ability to care deeply for the people and the world around you. That's something I truly admire.<br><br>" +
+            "I hope you never lose that beautiful empathy, even though it means you feel things more deeply than most.<br><br>" +
+            "And I hope there are countless moments this year that make 'Evergreen' play in your mind—not because you're holding onto memories, but because you're creating new ones that make you smile.<br><br>" +
+            "May this birthday bring you peace, laughter, unforgettable adventures, and every happiness you deserve. Keep smiling, keep being yourself, and keep making the world a little brighter just by being in it.<br><br>" +
+            "Happy Birthday, Kavyaa. Wishing you a year as beautiful and genuine as your heart. ❤️<br><br>" +
+            "<span style='font-weight:bold; color:gold;'>— The Creator</span>";
 
 
           fcCreator.classList.add('fc-show');
-          /* Show Continue button, wait for tap */
-          await fcDelay(600);  /* let card fully fade in first */
-          var cBtn = document.getElementById('fcCreatorContinueBtn');
-          if (cBtn) { cBtn.classList.add('gl-show'); }
-          await new Promise(function (resolve) {
-            if (!cBtn) { fcWaitTap().then(resolve); return; }
-            var _done = false;
-            function go(e) {
-              if (_done) return; _done = true;
-              if (e && e.cancelable) e.preventDefault();
-              cBtn.classList.remove('gl-show');
-              setTimeout(resolve, 350);
-            }
-            cBtn.addEventListener('click', go, { once: true });
-            cBtn.addEventListener('touchend', go, { once: true, passive: false });
-          });
+          await fcDelay(600);   /* let card fully fade in before showing slider */
+          await fcCreatorSwipeInteraction();
           fcCreator.classList.remove('fc-show');
           await fcDelay(700);
         }
