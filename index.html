@@ -4056,53 +4056,65 @@
       <div id="g4Cake">
         <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" overflow="visible">
           <defs>
-            <!-- Tier body gradients — pastel palette -->
+            <!-- Tier body gradients — VIBRANT BIRTHDAY PALETTE -->
+            <!-- Tier 1: Deep Hot Pink -->
             <linearGradient id="g4LPink" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#ffd6e7" />
-              <stop offset="100%" stop-color="#ff85c0" />
+              <stop offset="0%" stop-color="#FF4F9A" />
+              <stop offset="55%" stop-color="#FF2D7A" />
+              <stop offset="100%" stop-color="#CC1F60" />
             </linearGradient>
+            <!-- Tier 2: Royal Purple -->
             <linearGradient id="g4LLav" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#e8d5ff" />
-              <stop offset="100%" stop-color="#c080f0" />
+              <stop offset="0%" stop-color="#B06CFF" />
+              <stop offset="55%" stop-color="#8A4DFF" />
+              <stop offset="100%" stop-color="#6A2FD8" />
             </linearGradient>
+            <!-- Tier 3: Sky Blue -->
             <linearGradient id="g4LBlue" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#cce8ff" />
-              <stop offset="100%" stop-color="#7db8f0" />
+              <stop offset="0%" stop-color="#43E6FF" />
+              <stop offset="55%" stop-color="#4FB8FF" />
+              <stop offset="100%" stop-color="#2A8FE0" />
             </linearGradient>
+            <!-- Tier 4: Rich Vanilla/Gold sponge -->
             <linearGradient id="g4LCream" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#fffae0" />
-              <stop offset="100%" stop-color="#ffd060" />
+              <stop offset="0%" stop-color="#F6D365" />
+              <stop offset="55%" stop-color="#F4B942" />
+              <stop offset="100%" stop-color="#D4940A" />
             </linearGradient>
+            <!-- Serving plate: deep gold -->
             <linearGradient id="g4LPlate" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#ffe07a" />
-              <stop offset="100%" stop-color="#b87a10" />
+              <stop offset="0%" stop-color="#FFD84D" />
+              <stop offset="50%" stop-color="#E8A800" />
+              <stop offset="100%" stop-color="#8B5E00" />
             </linearGradient>
-            <!-- Top-face gradients (lighter than body) -->
+            <!-- Top-face gradients — bright frosting white -->
             <linearGradient id="g4PTop" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#ffe8f4" />
-              <stop offset="100%" stop-color="#ffb8d8" />
+              <stop offset="0%" stop-color="#FFFFFF" />
+              <stop offset="100%" stop-color="#FFD0E8" />
             </linearGradient>
             <linearGradient id="g4LTop" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#f2e5ff" />
-              <stop offset="100%" stop-color="#d8a8ff" />
+              <stop offset="0%" stop-color="#FFFFFF" />
+              <stop offset="100%" stop-color="#DFB8FF" />
             </linearGradient>
             <linearGradient id="g4BTop" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#e4f2ff" />
-              <stop offset="100%" stop-color="#a8d0ff" />
+              <stop offset="0%" stop-color="#FFFFFF" />
+              <stop offset="100%" stop-color="#A8E8FF" />
             </linearGradient>
             <linearGradient id="g4CTop" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#fffdf2" />
-              <stop offset="100%" stop-color="#ffe8a0" />
+              <stop offset="0%" stop-color="#FFFFFF" />
+              <stop offset="100%" stop-color="#FFE87A" />
             </linearGradient>
-            <!-- Sheen overlay for top 1/3 highlight -->
+            <!-- Glossy sheen — bright highlight -->
             <linearGradient id="g4Sheen" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="rgba(255,255,255,0.40)" />
+              <stop offset="0%" stop-color="rgba(255,255,255,0.62)" />
+              <stop offset="60%" stop-color="rgba(255,255,255,0.18)" />
               <stop offset="100%" stop-color="rgba(255,255,255,0)" />
             </linearGradient>
-            <!-- Ambient glow -->
+            <!-- Ambient glow — warm pink/gold -->
             <radialGradient id="g4RGlow" cx="50%" cy="55%" r="52%">
-              <stop offset="0%" stop-color="rgba(255,140,220,0.28)" />
-              <stop offset="100%" stop-color="rgba(255,140,220,0)" />
+              <stop offset="0%" stop-color="rgba(255,80,160,0.42)" />
+              <stop offset="60%" stop-color="rgba(255,140,60,0.18)" />
+              <stop offset="100%" stop-color="rgba(255,80,160,0)" />
             </radialGradient>
             <!-- Frosting glow filter -->
             <filter id="g4FG" x="-15%" y="-15%" width="130%" height="130%">
@@ -4112,68 +4124,99 @@
                 <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>
-            <!-- Subtle drop shadow for each tier -->
+            <!-- Deeper drop shadow for rich contrast -->
             <filter id="g4DS">
-              <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="rgba(0,0,0,0.17)" />
+              <feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="rgba(0,0,0,0.32)" />
             </filter>
             <!-- "22" topper gradient + glow filter -->
             <linearGradient id="g4L22" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#fffbe0" />
-              <stop offset="30%" stop-color="#ffd23c" />
-              <stop offset="68%" stop-color="#ff9800" />
-              <stop offset="100%" stop-color="#ffd23c" />
+              <stop offset="0%" stop-color="#FFFBE0" />
+              <stop offset="30%" stop-color="#FFD23C" />
+              <stop offset="68%" stop-color="#FF9800" />
+              <stop offset="100%" stop-color="#FFD23C" />
             </linearGradient>
             <filter id="g4F22" x="-55%" y="-55%" width="210%" height="210%">
-              <feDropShadow dx="0" dy="0" stdDeviation="3.5" flood-color="#ff8800" flood-opacity="0.95" />
-              <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#ffd23c" flood-opacity="0.55" />
+              <feDropShadow dx="0" dy="0" stdDeviation="3.5" flood-color="#FF8800" flood-opacity="0.95" />
+              <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#FFD23C" flood-opacity="0.55" />
             </filter>
+            <!-- Cherry gloss gradient -->
+            <radialGradient id="g4RCherry" cx="38%" cy="32%" r="55%">
+              <stop offset="0%" stop-color="#FF8888" />
+              <stop offset="60%" stop-color="#E8001A" />
+              <stop offset="100%" stop-color="#8B0010" />
+            </radialGradient>
+            <!-- Candy gloss gradient -->
+            <radialGradient id="g4RCandy" cx="35%" cy="30%" r="55%">
+              <stop offset="0%" stop-color="#FFFF99" />
+              <stop offset="100%" stop-color="#FFD84D" />
+            </radialGradient>
           </defs>
 
-          <!-- Ambient glow behind cake -->
+          <!-- Ambient glow behind cake — warm and vivid -->
           <ellipse cx="200" cy="198" rx="198" ry="108" fill="url(#g4RGlow)" />
 
-          <!-- Gold serving plate -->
-          <ellipse cx="200" cy="284" rx="186" ry="18" fill="url(#g4LPlate)" opacity="0.95" />
-          <ellipse cx="200" cy="280" rx="184" ry="10" fill="rgba(255,255,255,0.22)" />
+          <!-- Gold serving plate — deep and rich -->
+          <ellipse cx="200" cy="284" rx="186" ry="18" fill="url(#g4LPlate)" opacity="0.98" />
+          <ellipse cx="200" cy="280" rx="184" ry="10" fill="rgba(255,255,255,0.35)" />
+          <ellipse cx="200" cy="284" rx="186" ry="18" fill="none" stroke="#B87A00" stroke-width="1.5" opacity="0.6" />
 
-          <!-- ═══ TIER 1 — Pink (bottom / widest) ═══ -->
+          <!-- ═══ TIER 1 — Deep Hot Pink (bottom / widest) ═══ -->
           <rect x="20" y="224" width="360" height="56" rx="14" fill="url(#g4LPink)" filter="url(#g4DS)" />
+          <!-- Deep shadow band at bottom -->
+          <rect x="20" y="266" width="360" height="15" rx="8" fill="rgba(120,10,55,0.30)" />
+          <!-- Glossy sheen top -->
           <rect x="20" y="224" width="360" height="26" rx="14" fill="url(#g4Sheen)" />
-          <rect x="20" y="266" width="360" height="15" rx="8" fill="rgba(200,60,120,0.10)" />
-          <!-- Top face -->
+          <!-- Top face — bright white frosting -->
           <ellipse cx="200" cy="224" rx="180" ry="23" fill="url(#g4PTop)" />
-          <ellipse cx="200" cy="221" rx="173" ry="14" fill="rgba(255,255,255,0.30)" />
-          <ellipse cx="200" cy="224" rx="180" ry="23" fill="none" stroke="#ffd23c" stroke-width="2.5"
+          <ellipse cx="200" cy="221" rx="173" ry="14" fill="rgba(255,255,255,0.55)" />
+          <ellipse cx="200" cy="224" rx="180" ry="23" fill="none" stroke="#FFD84D" stroke-width="2.8"
             filter="url(#g4FG)" />
-          <!-- White frosting drips -->
+          <!-- Bright white buttercream frosting drips -->
           <path
             d="M24 225 Q36 250 50 225 Q66 254 84 225 Q102 252 120 225 Q140 256 158 225 Q176 253 196 225 Q216 257 236 225 Q254 253 272 225 Q290 252 308 225 Q326 255 344 225 Q358 250 376 225"
-            fill="rgba(255,255,255,0.86)" filter="url(#g4FG)" />
+            fill="rgba(255,255,255,0.97)" filter="url(#g4FG)" />
+          <!-- Bold hot-pink icing line -->
           <path
             d="M24 225 Q36 247 50 225 Q66 251 84 225 Q102 249 120 225 Q140 253 158 225 Q176 250 196 225 Q216 254 236 225 Q254 250 272 225 Q290 249 308 225 Q326 252 344 225 Q358 247 376 225"
-            fill="none" stroke="#ff80c0" stroke-width="3" stroke-linecap="round" opacity="0.82" filter="url(#g4FG)" />
-          <!-- Gold sprinkles -->
-          <g fill="#ffd23c" opacity="0.92">
-            <circle cx="50" cy="252" r="3.5" />
-            <circle cx="88" cy="259" r="3" />
-            <circle cx="128" cy="256" r="3.5" />
-            <circle cx="168" cy="262" r="3" />
-            <circle cx="200" cy="259" r="4" />
-            <circle cx="232" cy="262" r="3" />
-            <circle cx="272" cy="256" r="3.5" />
-            <circle cx="312" cy="259" r="3" />
-            <circle cx="350" cy="252" r="3.5" />
+            fill="none" stroke="#FF2D7A" stroke-width="3.5" stroke-linecap="round" opacity="0.95" filter="url(#g4FG)" />
+          <!-- Vibrant multi-color sprinkles -->
+          <circle cx="50" cy="252" r="3.5" fill="#3CD970" />
+          <circle cx="70" cy="246" r="2.5" fill="#43E6FF" />
+          <circle cx="88" cy="259" r="3" fill="#FF914D" />
+          <circle cx="108" cy="249" r="2.5" fill="#FFD84D" />
+          <circle cx="128" cy="256" r="3.5" fill="#8A4DFF" />
+          <circle cx="148" cy="248" r="2.5" fill="#FF4F9A" />
+          <circle cx="168" cy="262" r="3" fill="#43E6FF" />
+          <circle cx="184" cy="250" r="2.5" fill="#3CD970" />
+          <circle cx="200" cy="259" r="4" fill="#FFD84D" />
+          <circle cx="216" cy="250" r="2.5" fill="#FF4A5F" />
+          <circle cx="232" cy="262" r="3" fill="#4FB8FF" />
+          <circle cx="252" cy="248" r="2.5" fill="#FF914D" />
+          <circle cx="272" cy="256" r="3.5" fill="#8A4DFF" />
+          <circle cx="292" cy="249" r="2.5" fill="#FFD84D" />
+          <circle cx="312" cy="259" r="3" fill="#3CD970" />
+          <circle cx="332" cy="247" r="2.5" fill="#FF2D7A" />
+          <circle cx="350" cy="252" r="3.5" fill="#43E6FF" />
+          <!-- Glossy white cream rosettes on top face -->
+          <g filter="url(#g4FG)">
+            <circle cx="88" cy="219" r="6" fill="rgba(255,255,255,0.92)" />
+            <circle cx="88" cy="217" r="2.5" fill="rgba(255,255,255,1)" />
+            <circle cx="142" cy="216" r="5" fill="rgba(255,255,255,0.90)" />
+            <circle cx="142" cy="214" r="2" fill="rgba(255,255,255,1)" />
+            <circle cx="200" cy="213" r="6.5" fill="rgba(255,255,255,0.95)" />
+            <circle cx="200" cy="211" r="2.5" fill="rgba(255,255,255,1)" />
+            <circle cx="258" cy="216" r="5" fill="rgba(255,255,255,0.90)" />
+            <circle cx="258" cy="214" r="2" fill="rgba(255,255,255,1)" />
+            <circle cx="312" cy="219" r="6" fill="rgba(255,255,255,0.92)" />
+            <circle cx="312" cy="217" r="2.5" fill="rgba(255,255,255,1)" />
           </g>
-          <!-- Cream rosettes on top face -->
-          <g fill="rgba(255,255,255,0.74)" filter="url(#g4FG)">
-            <circle cx="88" cy="219" r="5.5" />
-            <circle cx="142" cy="216" r="4.5" />
-            <circle cx="200" cy="213" r="6" />
-            <circle cx="258" cy="216" r="4.5" />
-            <circle cx="312" cy="219" r="5.5" />
-          </g>
-          <!-- Pearl string -->
-          <g fill="rgba(255,255,255,0.52)">
+          <!-- Vivid cherry decorations on top -->
+          <circle cx="60" cy="218" r="5.5" fill="url(#g4RCherry)" />
+          <circle cx="59" cy="216" r="1.8" fill="rgba(255,255,255,0.70)" />
+          <circle cx="340" cy="218" r="5.5" fill="url(#g4RCherry)" />
+          <circle cx="339" cy="216" r="1.8" fill="rgba(255,255,255,0.70)" />
+          <!-- Pearl string — ivory white -->
+          <g fill="rgba(255,255,255,0.80)">
             <circle cx="34" cy="250" r="3.5" />
             <circle cx="70" cy="261" r="3" />
             <circle cx="116" cy="268" r="3.5" />
@@ -4185,35 +4228,52 @@
             <circle cx="366" cy="250" r="3.5" />
           </g>
 
-          <!-- ═══ TIER 2 — Lavender ═══ -->
+          <!-- ═══ TIER 2 — Royal Purple ═══ -->
           <rect x="68" y="157" width="264" height="70" rx="12" fill="url(#g4LLav)" filter="url(#g4DS)" />
+          <!-- Deep shadow at base -->
+          <rect x="68" y="213" width="264" height="14" rx="7" fill="rgba(50,10,120,0.35)" />
+          <!-- Glossy sheen top -->
           <rect x="68" y="157" width="264" height="24" rx="12" fill="url(#g4Sheen)" />
-          <rect x="68" y="213" width="264" height="14" rx="7" fill="rgba(140,60,200,0.09)" />
           <ellipse cx="200" cy="157" rx="132" ry="18" fill="url(#g4LTop)" />
-          <ellipse cx="200" cy="154" rx="125" ry="11" fill="rgba(255,255,255,0.30)" />
-          <ellipse cx="200" cy="157" rx="132" ry="18" fill="none" stroke="#ffd23c" stroke-width="2"
+          <ellipse cx="200" cy="154" rx="125" ry="11" fill="rgba(255,255,255,0.55)" />
+          <ellipse cx="200" cy="157" rx="132" ry="18" fill="none" stroke="#FFD84D" stroke-width="2.2"
             filter="url(#g4FG)" />
+          <!-- Bright white buttercream drips -->
           <path
             d="M72 158 Q84 179 98 158 Q114 182 132 158 Q150 181 168 158 Q186 185 204 158 Q222 182 240 158 Q258 181 276 158 Q292 179 308 158 Q320 179 328 158"
-            fill="rgba(255,255,255,0.84)" filter="url(#g4FG)" />
+            fill="rgba(255,255,255,0.97)" filter="url(#g4FG)" />
+          <!-- Bold lavender icing outline -->
           <path
             d="M72 158 Q84 176 98 158 Q114 180 132 158 Q150 179 168 158 Q186 182 204 158 Q222 179 240 158 Q258 179 276 158 Q292 176 308 158 Q320 176 328 158"
-            fill="none" stroke="#c880ff" stroke-width="2.5" stroke-linecap="round" opacity="0.82" filter="url(#g4FG)" />
-          <g fill="#ffd23c" opacity="0.88">
-            <circle cx="98" cy="187" r="3" />
-            <circle cx="136" cy="194" r="2.5" />
-            <circle cx="174" cy="191" r="3" />
-            <circle cx="200" cy="195" r="3.5" />
-            <circle cx="226" cy="191" r="3" />
-            <circle cx="264" cy="194" r="2.5" />
-            <circle cx="302" cy="187" r="3" />
+            fill="none" stroke="#B06CFF" stroke-width="3" stroke-linecap="round" opacity="0.98" filter="url(#g4FG)" />
+          <!-- Vibrant multi-color sprinkles -->
+          <circle cx="88" cy="185" r="3" fill="#FF4F9A" />
+          <circle cx="108" cy="193" r="2.5" fill="#FFD84D" />
+          <circle cx="136" cy="194" r="3" fill="#3CD970" />
+          <circle cx="160" cy="189" r="2.5" fill="#43E6FF" />
+          <circle cx="174" cy="191" r="3" fill="#FF914D" />
+          <circle cx="200" cy="195" r="3.5" fill="#FFFFFF" />
+          <circle cx="226" cy="191" r="3" fill="#FF4A5F" />
+          <circle cx="244" cy="188" r="2.5" fill="#4FB8FF" />
+          <circle cx="264" cy="194" r="3" fill="#FFD84D" />
+          <circle cx="288" cy="187" r="2.5" fill="#3CD970" />
+          <circle cx="302" cy="187" r="3" fill="#8A4DFF" />
+          <!-- Glossy cream rosettes -->
+          <g filter="url(#g4FG)">
+            <circle cx="130" cy="153" r="4.5" fill="rgba(255,255,255,0.95)" />
+            <circle cx="130" cy="151" r="1.8" fill="rgba(255,255,255,1)" />
+            <circle cx="200" cy="150" r="6" fill="rgba(255,255,255,0.98)" />
+            <circle cx="200" cy="148" r="2.2" fill="rgba(255,255,255,1)" />
+            <circle cx="270" cy="153" r="4.5" fill="rgba(255,255,255,0.95)" />
+            <circle cx="270" cy="151" r="1.8" fill="rgba(255,255,255,1)" />
           </g>
-          <g fill="rgba(255,255,255,0.72)" filter="url(#g4FG)">
-            <circle cx="130" cy="153" r="4" />
-            <circle cx="200" cy="150" r="5.5" />
-            <circle cx="270" cy="153" r="4" />
-          </g>
-          <g fill="rgba(255,255,255,0.48)">
+          <!-- Rich cherry decorations -->
+          <circle cx="95" cy="155" r="5" fill="url(#g4RCherry)" />
+          <circle cx="94" cy="153" r="1.6" fill="rgba(255,255,255,0.65)" />
+          <circle cx="305" cy="155" r="5" fill="url(#g4RCherry)" />
+          <circle cx="304" cy="153" r="1.6" fill="rgba(255,255,255,0.65)" />
+          <!-- Pearl string -->
+          <g fill="rgba(255,255,255,0.80)">
             <circle cx="82" cy="189" r="3" />
             <circle cx="114" cy="199" r="2.5" />
             <circle cx="152" cy="205" r="3" />
@@ -4223,33 +4283,46 @@
             <circle cx="318" cy="189" r="3" />
           </g>
 
-          <!-- ═══ TIER 3 — Pastel Blue ═══ -->
+          <!-- ═══ TIER 3 — Sky Blue / Aqua ═══ -->
           <rect x="113" y="98" width="174" height="62" rx="10" fill="url(#g4LBlue)" filter="url(#g4DS)" />
+          <!-- Deep shadow at base -->
+          <rect x="113" y="148" width="174" height="13" rx="6" fill="rgba(10,60,140,0.30)" />
+          <!-- Glossy sheen top -->
           <rect x="113" y="98" width="174" height="22" rx="10" fill="url(#g4Sheen)" />
-          <rect x="113" y="148" width="174" height="13" rx="6" fill="rgba(60,100,200,0.08)" />
           <ellipse cx="200" cy="98" rx="87" ry="13" fill="url(#g4BTop)" />
-          <ellipse cx="200" cy="95" rx="81" ry="8" fill="rgba(255,255,255,0.32)" />
-          <ellipse cx="200" cy="98" rx="87" ry="13" fill="none" stroke="#ffd23c" stroke-width="1.8"
-            filter="url(#g4FG)" />
+          <ellipse cx="200" cy="95" rx="81" ry="8" fill="rgba(255,255,255,0.55)" />
+          <ellipse cx="200" cy="98" rx="87" ry="13" fill="none" stroke="#FFD84D" stroke-width="2" filter="url(#g4FG)" />
+          <!-- Bright white buttercream drips -->
           <path
             d="M117 99 Q130 116 143 99 Q158 120 175 99 Q192 122 209 99 Q226 120 243 99 Q258 116 271 99 Q280 115 283 99"
-            fill="rgba(255,255,255,0.84)" filter="url(#g4FG)" />
+            fill="rgba(255,255,255,0.97)" filter="url(#g4FG)" />
+          <!-- Bold aqua icing line -->
           <path
             d="M117 99 Q130 114 143 99 Q158 118 175 99 Q192 120 209 99 Q226 118 243 99 Q258 114 271 99 Q280 113 283 99"
-            fill="none" stroke="#80c8ff" stroke-width="2.2" stroke-linecap="round" opacity="0.82" filter="url(#g4FG)" />
-          <g fill="#ffd23c" opacity="0.90">
-            <circle cx="138" cy="122" r="2.5" />
-            <circle cx="168" cy="129" r="2.5" />
-            <circle cx="200" cy="131" r="3" />
-            <circle cx="232" cy="129" r="2.5" />
-            <circle cx="262" cy="122" r="2.5" />
+            fill="none" stroke="#43E6FF" stroke-width="2.8" stroke-linecap="round" opacity="0.98" filter="url(#g4FG)" />
+          <!-- Vibrant multi-color sprinkles -->
+          <circle cx="128" cy="120" r="2.5" fill="#FF4F9A" />
+          <circle cx="138" cy="127" r="2.5" fill="#FFD84D" />
+          <circle cx="155" cy="129" r="2.5" fill="#3CD970" />
+          <circle cx="168" cy="129" r="2.5" fill="#FF914D" />
+          <circle cx="184" cy="131" r="2" fill="#8A4DFF" />
+          <circle cx="200" cy="131" r="3" fill="#FFFFFF" />
+          <circle cx="216" cy="131" r="2" fill="#FF4A5F" />
+          <circle cx="232" cy="129" r="2.5" fill="#43E6FF" />
+          <circle cx="246" cy="129" r="2.5" fill="#FFD84D" />
+          <circle cx="262" cy="122" r="2.5" fill="#3CD970" />
+          <circle cx="272" cy="120" r="2.5" fill="#4FB8FF" />
+          <!-- Glossy cream rosettes -->
+          <g filter="url(#g4FG)">
+            <circle cx="155" cy="94" r="4" fill="rgba(255,255,255,0.95)" />
+            <circle cx="155" cy="92" r="1.6" fill="rgba(255,255,255,1)" />
+            <circle cx="200" cy="91" r="5" fill="rgba(255,255,255,0.98)" />
+            <circle cx="200" cy="89" r="2" fill="rgba(255,255,255,1)" />
+            <circle cx="245" cy="94" r="4" fill="rgba(255,255,255,0.95)" />
+            <circle cx="245" cy="92" r="1.6" fill="rgba(255,255,255,1)" />
           </g>
-          <g fill="rgba(255,255,255,0.74)" filter="url(#g4FG)">
-            <circle cx="155" cy="94" r="3.5" />
-            <circle cx="200" cy="91" r="4.5" />
-            <circle cx="245" cy="94" r="3.5" />
-          </g>
-          <g fill="rgba(255,255,255,0.50)">
+          <!-- Pearl string -->
+          <g fill="rgba(255,255,255,0.80)">
             <circle cx="124" cy="120" r="2.5" />
             <circle cx="152" cy="130" r="2" />
             <circle cx="180" cy="136" r="2.5" />
@@ -4259,29 +4332,38 @@
             <circle cx="276" cy="120" r="2.5" />
           </g>
 
-          <!-- ═══ TIER 4 — Cream / Gold (top) ═══ -->
+          <!-- ═══ TIER 4 — Rich Vanilla/Gold Sponge (top) ═══ -->
           <rect x="150" y="50" width="100" height="51" rx="9" fill="url(#g4LCream)" filter="url(#g4DS)" />
+          <!-- Deep shadow at base -->
+          <rect x="150" y="92" width="100" height="10" rx="5" fill="rgba(100,55,0,0.30)" />
+          <!-- Glossy sheen top -->
           <rect x="150" y="50" width="100" height="19" rx="9" fill="url(#g4Sheen)" />
-          <rect x="150" y="92" width="100" height="10" rx="5" fill="rgba(180,120,10,0.08)" />
           <ellipse cx="200" cy="50" rx="50" ry="9.5" fill="url(#g4CTop)" />
-          <ellipse cx="200" cy="47" rx="44" ry="5.5" fill="rgba(255,255,255,0.38)" />
-          <ellipse cx="200" cy="50" rx="50" ry="9.5" fill="none" stroke="#ffd23c" stroke-width="1.6"
+          <ellipse cx="200" cy="47" rx="44" ry="5.5" fill="rgba(255,255,255,0.60)" />
+          <ellipse cx="200" cy="50" rx="50" ry="9.5" fill="none" stroke="#FF914D" stroke-width="1.8"
             filter="url(#g4FG)" />
+          <!-- Bright white buttercream drips -->
           <path d="M154 51 Q164 63 174 51 Q184 66 196 51 Q208 67 220 51 Q230 63 240 51 Q245 62 246 51"
-            fill="rgba(255,255,255,0.86)" filter="url(#g4FG)" />
+            fill="rgba(255,255,255,0.97)" filter="url(#g4FG)" />
+          <!-- Bold golden icing line -->
           <path d="M154 51 Q164 61 174 51 Q184 64 196 51 Q208 65 220 51 Q230 62 240 51 Q245 61 246 51" fill="none"
-            stroke="#ffd060" stroke-width="1.8" stroke-linecap="round" opacity="0.90" filter="url(#g4FG)" />
-          <g fill="#ffd23c" opacity="0.92">
-            <circle cx="164" cy="66" r="2.5" />
-            <circle cx="184" cy="72" r="2.5" />
-            <circle cx="200" cy="74" r="3" />
-            <circle cx="216" cy="72" r="2.5" />
-            <circle cx="236" cy="66" r="2.5" />
-          </g>
-          <g fill="rgba(255,255,255,0.76)" filter="url(#g4FG)">
-            <circle cx="172" cy="46" r="3" />
-            <circle cx="200" cy="43" r="4.5" />
-            <circle cx="228" cy="46" r="3" />
+            stroke="#FF914D" stroke-width="2.2" stroke-linecap="round" opacity="0.98" filter="url(#g4FG)" />
+          <!-- Vibrant multi-color sprinkles -->
+          <circle cx="162" cy="65" r="2.5" fill="#FF4F9A" />
+          <circle cx="172" cy="72" r="2" fill="#43E6FF" />
+          <circle cx="184" cy="72" r="2.5" fill="#3CD970" />
+          <circle cx="200" cy="74" r="3" fill="#FFD84D" />
+          <circle cx="216" cy="72" r="2.5" fill="#8A4DFF" />
+          <circle cx="228" cy="70" r="2" fill="#FF4A5F" />
+          <circle cx="238" cy="65" r="2.5" fill="#4FB8FF" />
+          <!-- Glossy cream rosettes -->
+          <g filter="url(#g4FG)">
+            <circle cx="172" cy="46" r="3.5" fill="rgba(255,255,255,0.95)" />
+            <circle cx="172" cy="44" r="1.4" fill="rgba(255,255,255,1)" />
+            <circle cx="200" cy="43" r="5" fill="rgba(255,255,255,0.98)" />
+            <circle cx="200" cy="41" r="2" fill="rgba(255,255,255,1)" />
+            <circle cx="228" cy="46" r="3.5" fill="rgba(255,255,255,0.95)" />
+            <circle cx="228" cy="44" r="1.4" fill="rgba(255,255,255,1)" />
           </g>
 
           <!-- ═══ Golden "22" Birthday Topper ═══ -->
@@ -4439,6 +4521,49 @@
         </div>
         <button class="btn btn-green" id="g3continue" style="margin-top:26px">CONTINUE</button>
       </div>
+
+      <!-- Infinite heart collection for Level 3 -->
+      <div id="g3InfHeartWrap"
+        style="position: absolute; inset: 0; background: rgba(0, 0, 10, 0.93); display: none; flex-direction: column; align-items: center; justify-content: center; gap: 18px; z-index: 150;">
+        <style>
+          #g3InfHeart {
+            position: relative;
+            width: clamp(120px, 32vw, 155px);
+            height: clamp(120px, 32vw, 155px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            animation: ihPulse 1.9s ease-in-out infinite;
+          }
+
+          #g3InfHeart svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 18px rgba(255, 80, 120, 0.85)) drop-shadow(0 0 42px rgba(200, 40, 80, 0.5));
+          }
+
+          #g3InfHeart .ih-inf {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -46%);
+            font-size: clamp(28px, 7.5vw, 42px);
+            font-weight: 900;
+            color: rgba(255, 225, 235, 0.97);
+            text-shadow: 0 0 10px rgba(255, 80, 120, 0.9), 0 0 3px #fff;
+            pointer-events: none;
+            line-height: 1;
+          }
+        </style>
+        <div id="g3InfHeart"></div>
+        <div id="g3TapHint"
+          style="font-size: clamp(12px, 3vw, 15px); font-weight: 600; color: rgba(255, 255, 255, 0.72); letter-spacing: 0.5px; text-shadow: 0 0 10px rgba(255, 80, 120, 0.5); text-align: center; pointer-events: none;">
+          Pop the Infinite Hearts to collect them.</div>
+      </div>
+
       <canvas id="fxCanvas" style="position:fixed;inset:0;z-index:125;pointer-events:none;"></canvas>
     </div>
 
@@ -7012,6 +7137,12 @@ Now it's time for the part everyone has been waiting for.`
       buildAtmos(); buildHead(); buildBowl();
       g3.countEl.textContent = 'Cook the perfect bowl — catch all 9 ingredients! (0/9)';
 
+      // Initialize single falling ingredient DOM element once and reuse it
+      g3.fallingIngElement = document.createElement('div');
+      g3.fallingIngElement.className = 'ingr';
+      g3.fallingIngElement.style.display = 'none';
+      g3.field.appendChild(g3.fallingIngElement);
+
       // Set initial position and update metrics
       g3.bowlX = window.innerWidth / 2;
       g3.bowlW = 300; // default initial fallback
@@ -7030,6 +7161,8 @@ Now it's time for the part everyone has been waiting for.`
 
       g3.running = true; g3.last = performance.now();
 
+      // Spawn the first ingredient immediately
+      spawnIngredient();
     }
     function updateCatchY() {
       const rect = g3.bowl.getBoundingClientRect();
@@ -7058,25 +7191,36 @@ Now it's time for the part everyone has been waiting for.`
       if (e.key === 'ArrowLeft') moveBowl(g3.bowlX - 60);
       else if (e.key === 'ArrowRight') moveBowl(g3.bowlX + 60);
     }
-    const G3_MAX_INGR = MOBILE ? 3 : 6;   /* cap concurrent falling ingredients — keep screen clean */
     function spawnIngredient() {
-      if (g3.items.length >= G3_MAX_INGR) return;   /* limit active DOM elements */
-      /* Vertical spacing guard: don't spawn while an ingredient is still near the top */
-      const _topZone = window.innerHeight * 0.28;   /* tighter gap — only spawn when top 28% is clear */
-      if (g3.items.some(function (it) { return it.y < _topZone && it.y > -55; })) return;
+      if (!g3.running) return;
+      if (g3.items.length > 0) return; // Only one ingredient at a time!
+
       const missing = ING_KEYS.filter(k => !g3.collected[k]);
       let key;
       if (missing.length && Math.random() < 0.62) key = missing[(Math.random() * missing.length) | 0];
       else key = ING_KEYS[(Math.random() * ING_KEYS.length) | 0];
-      const el = document.createElement('div'); el.className = 'ingr'; el.innerHTML = ING_SVG[key];
+
+      const el = g3.fallingIngElement;
+      el.innerHTML = ING_SVG[key];
+      el.style.display = 'block';
+      el.style.opacity = '1';
+
       const W = window.innerWidth, x = 60 + Math.random() * (W - 120);
-      // Do NOT set el.style.left — CSS default is left:0; the transform
-      // translate(it.x, it.y) translate(-50%,-50%) places the visual CENTER
-      // exactly at (it.x, it.y) in viewport space. Setting left:x here would
-      // double the horizontal offset and misalign collision vs. visuals.
-      g3.field.appendChild(el);
       const ingId = Date.now() + '_' + (Math.random() * 1e6 | 0);
-      g3.items.push({ el, id: ingId, type: key, key, x, y: -60, vy: 275 + Math.random() * 155, rot: Math.random() * 40 - 20, vr: Math.random() * 140 - 70 });   /* fast fall → fewer simultaneous DOM nodes */
+      // Increased falling speed slightly for engaging gameplay (Original was 275 + random * 155)
+      const vy = 360 + Math.random() * 180;
+
+      g3.items = [{
+        el,
+        id: ingId,
+        type: key,
+        key,
+        x,
+        y: -60,
+        vy: vy,
+        rot: Math.random() * 40 - 20,
+        vr: Math.random() * 140 - 70
+      }];
     }
     function updateGame3(now) {
       if (!g3.running) return;
@@ -7086,8 +7230,7 @@ Now it's time for the part everyone has been waiting for.`
       g3.steamT += dt;
       const steamRate = 0.45 - g3.count * 0.025;            // thicker steam as it cooks, but optimized (from 0.45s down to 0.225s)
       if (g3.steamT > steamRate) { g3.steamT = 0; steamPuff(g3.steam, 36 + Math.random() * 36, 0.5 + g3.count / 12); }
-      // spawn
-      if (now - g3.lastSpawn > g3.spawnGap) { spawnIngredient(); g3.lastSpawn = now; g3.spawnGap = Math.max(MOBILE ? 1350 : 1050, g3.spawnGap - 5); }
+
       const H = window.innerHeight;
       const catchRad = (g3.bowlW || 300) * 0.4; // dynamic collision width
       for (let k = g3.items.length - 1; k >= 0; k--) {
@@ -7096,15 +7239,23 @@ Now it's time for the part everyone has been waiting for.`
         if (!it) continue;
         it.y += it.vy * dt; it.rot += it.vr * dt;
         it.el.style.transform = `translate(${it.x}px,${it.y}px) translate(-50%,-50%) rotate(${it.rot}deg)`;
+
         // Bounding-box collision: catch when ingredient bottom edge (it.y+32)
         // crosses the bowl rim (catchY) and centre is still within the bowl.
-        // it.x is the visual centre X — compare directly to bowl centre.
         if (it.y + 32 > g3.catchY && it.y < g3.catchY + 48 && Math.abs(it.x - g3.bowlX) < catchRad) {
-          catchIngredient(it); g3.items.splice(k, 1); continue;
+          catchIngredient(it);
+          g3.items.splice(k, 1);
+          // Spawn another ingredient immediately
+          spawnIngredient();
+          continue;
         }
-        if (it.y > H + 70) { it.el.remove(); g3.items.splice(k, 1); }
+        if (it.y > H + 70) {
+          it.el.style.display = 'none';
+          g3.items.splice(k, 1);
+          // Spawn another ingredient immediately
+          spawnIngredient();
+        }
       }
-
     }
     // Steam puff pool — pre-created DOM blobs, recycled to avoid GC spikes
     const _steamPool = [];
@@ -7200,9 +7351,8 @@ Now it's time for the part everyone has been waiting for.`
     function catchIngredient(it) {
       // Use a single captured type so score, garnish, and chip always match.
       const ingType = it.type || it.key;
-      // Remove immediately — no frame delay, ingredient cannot continue falling.
-      it.el.style.opacity = '0';
-      it.el.remove();
+      // Hide immediately — no frame delay, ingredient cannot continue falling.
+      it.el.style.display = 'none';
       const isNew = !g3.collected[ingType];
       g3.score += ING_PTS[ingType] || 10;
       // feedback
@@ -7272,7 +7422,8 @@ Now it's time for the part everyone has been waiting for.`
       window.removeEventListener('pointermove', g3Move);
       window.removeEventListener('pointerup', g3Up);
       window.removeEventListener('keydown', g3Key);
-      g3.items.forEach(it => it.el.remove()); g3.items = [];
+      if (g3.fallingIngElement) g3.fallingIngElement.style.display = 'none';
+      g3.items = [];
       // gentle cook: zoom into the finished bowl with light steam (no cloud bursts / flashes)
       // Copy garnish into the cinematic bowl before showing it
       g3.cineBowl.innerHTML = bowlSVG(brothColor());
@@ -7371,9 +7522,131 @@ Now it's time for the part everyone has been waiting for.`
         setTimeout(showNaruStep, 150);
       } else {
         const n = document.getElementById('naru'); n.classList.remove('in');
-        setTimeout(() => { n.classList.remove('show'); winFinale(); }, 500);
+        setTimeout(() => { n.classList.remove('show'); startG3InfiniteHearts(); }, 500);
       }
     });
+
+    function startG3InfiniteHearts() {
+      const wrap = document.getElementById('g3InfHeartWrap');
+      const infEl = document.getElementById('g3InfHeart');
+      const hint = document.getElementById('g3TapHint');
+
+      wrap.style.display = 'flex';
+      wrap.style.opacity = '0';
+      // Force reflow
+      void wrap.offsetWidth;
+      wrap.style.transition = 'opacity 0.55s ease';
+      wrap.style.opacity = '1';
+
+      let heartIndex = 0;
+
+      function spawnNextHeart() {
+        if (heartIndex >= 2) {
+          // Fade wrap out and proceed to level completion
+          wrap.style.transition = 'opacity 0.55s ease';
+          wrap.style.opacity = '0';
+          setTimeout(() => {
+            wrap.style.display = 'none';
+            winFinale(); // Continue with existing level completion flow
+          }, 550);
+          return;
+        }
+
+        // Reset/Build SVG heart matching codebase style
+        const uid = 'g3ih_' + Date.now() + '_' + heartIndex;
+        infEl.innerHTML =
+          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 42 42">' +
+          '<defs><radialGradient id="' + uid + '" cx="40%" cy="30%" r="65%">' +
+          '<stop offset="0" stop-color="#ff8fa3"/>' +
+          '<stop offset="1" stop-color="#d4003a"/>' +
+          '</radialGradient></defs>' +
+          '<path d="M21 36C21 36 4 25 4 13.5C4 8 8 4 13 4C16.5 4 19.5 6.2 21 9' +
+          'C22.5 6.2 25.5 4 29 4C34 4 38 8 38 13.5C38 25 21 36 21 36Z"' +
+          ' fill="url(#' + uid + ')" stroke="#a0002e" stroke-width="1.2"/>' +
+          '<ellipse cx="15" cy="12" rx="3.5" ry="5" fill="rgba(255,255,255,.38)" transform="rotate(-20,15,12)"/>' +
+          '</svg>' +
+          '<span class="ih-inf">&#x221e;</span>';
+
+        // Scale in animation
+        infEl.style.animation = 'none';
+        infEl.style.transition = 'none';
+        infEl.style.transform = 'scale(0)';
+        infEl.style.opacity = '0';
+        void infEl.offsetWidth;
+        infEl.style.transition = 'transform 0.38s cubic-bezier(.2,1.35,.4,1), opacity 0.3s ease';
+        infEl.style.transform = 'scale(1)';
+        infEl.style.opacity = '1';
+
+        setTimeout(() => {
+          infEl.style.transition = '';
+          infEl.style.animation = 'ihPulse 1.9s ease-in-out infinite';
+        }, 400);
+
+        function onHeartTap(e) {
+          if (e && e.cancelable) e.preventDefault();
+          infEl.removeEventListener('click', onHeartTap);
+          infEl.removeEventListener('touchend', onHeartTap);
+
+          // Pop: pause pulse, scale up
+          infEl.style.animation = 'none';
+          infEl.style.transition = 'transform 0.15s ease';
+          infEl.style.transform = 'scale(1.28)';
+
+          setTimeout(() => {
+            // Burst tiny hearts outward using the exact same burstHearts logic
+            var rect = infEl.getBoundingClientRect();
+            var cx = rect.left + rect.width / 2;
+            var cy = rect.top + rect.height / 2;
+            var N = 24;
+            for (var i = 0; i < N; i++) {
+              (function (idx) {
+                var uid4 = 'g3th_' + Date.now() + '_' + idx;
+                var angle = (idx / N) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
+                var dist = 70 + Math.random() * 110;
+                var tx = Math.cos(angle) * dist;
+                var ty = Math.sin(angle) * dist;
+                var dur = 480 + Math.random() * 180;
+                var el = document.createElement('span');
+                el.className = 'fc-tiny-heart';
+                el.style.cssText =
+                  'left:' + (cx - 9) + 'px;' +
+                  'top:' + (cy - 9) + 'px;' +
+                  '--fth-tx:' + tx.toFixed(1) + 'px;' +
+                  '--fth-ty:' + ty.toFixed(1) + 'px;' +
+                  '--fth-dur:' + dur.toFixed(0) + 'ms;';
+                el.innerHTML =
+                  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 42 42">' +
+                  '<defs><radialGradient id="' + uid4 + '" cx="40%" cy="30%" r="65%">' +
+                  '<stop offset="0" stop-color="#ff8fa3"/>' +
+                  '<stop offset="1" stop-color="#d4003a"/>' +
+                  '</radialGradient></defs>' +
+                  '<path d="M21 36C21 36 4 25 4 13.5C4 8 8 4 13 4C16.5 4 19.5 6.2 21 9' +
+                  'C22.5 6.2 25.5 4 29 4C34 4 38 8 38 13.5C38 25 21 36 21 36Z"' +
+                  ' fill="url(#' + uid4 + ')"/></svg>';
+                document.body.appendChild(el);
+                setTimeout(function () { try { el.remove(); } catch (_) { } }, dur + 60);
+              })(i);
+            }
+
+            // Collapse heart
+            infEl.style.transition = 'transform 0.25s ease, opacity 0.3s ease';
+            infEl.style.transform = 'scale(0.35)';
+            infEl.style.opacity = '0';
+
+            setTimeout(() => {
+              heartIndex++;
+              spawnNextHeart();
+            }, 300);
+          }, 160);
+        }
+
+        infEl.addEventListener('click', onHeartTap);
+        infEl.addEventListener('touchend', onHeartTap, { passive: false });
+      }
+
+      spawnNextHeart();
+    }
+
     function winFinale() {
       g3.cine.classList.remove('show');
       g3.win.classList.add('show');
@@ -8812,12 +9085,12 @@ Now it's time for the part everyone has been waiting for.`
           fcDS.style.transform = 'translateX(-110vw)';
 
           await fcDelay(200);
-          fcTapHint.textContent = 'Tap to encourage her! (1/3)';
+          fcTapHint.textContent = 'Tap to encourage them! (1/4)';
           fcTapHint.style.opacity = '1';
 
           var taps = 0;
           var peeks = ['translateX(-75%)', 'translateX(-50%)', 'translateX(-25%)'];
-          var tapMsgs = ['Come on, tap again! (2/3)', 'Almost there! (3/3)'];
+          var tapMsgs = ['Come on, tap again! (2/4)', 'Almost there! (3/4)', 'Thank you! (4/4)'];
 
           await new Promise(function (resolve) {
             fcSpecialTap = function () {
