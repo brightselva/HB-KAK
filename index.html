@@ -3878,6 +3878,8 @@
       }
     }
   </style>
+  <!-- Journey tracking: Supabase JS (blocking load in head ensures it is ready before game script) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -4632,6 +4634,129 @@
   <script>
     "use strict";
 
+    /* ===================================================================
+       JOURNEY TRACKING
+       Passive background-only telemetry. Zero gameplay impact.
+       Nothing in this block blocks rendering or the RAF loop.
+       All writes are fire-and-forget; errors are silently swallowed.
+       =================================================================== */
+
+    // ── Supabase credentials ──────────────────────────────────────────────
+    var SUPABASE_URL      = 'https://pcvltsyhncjkjqijppxo.supabase.co';
+    var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjdmx0c3lobmNqa2pxaWpwcHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3OTg1MjMsImV4cCI6MjA4NDM3NDUyM30.FMUA0WxK2XfVQ6vCjs9Jd5Nzll2esR-6ETKE8-ODYIA';
+    var _supaClient = null;
+    try {
+      _supaClient = (typeof window.supabase !== 'undefined')
+        ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        : null;
+    } catch (_je) { _supaClient = null; }
+
+    // ── UUID generator ────────────────────────────────────────────────────
+    function _jUUID() {
+      if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+        return crypto.randomUUID();
+      }
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0;
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+      });
+    }
+
+    // ── Journey object ────────────────────────────────────────────────────
+    var journey = {
+      schemaVersion: 1,
+      gameVersion: '1.0.0',
+      sessionId: '',
+      startedAt: '',
+      endedAt: '',
+      totalDuration: 0,
+      completed: false,
+      eventSequence: 0,
+      device: {
+        browser: '', platform: '', language: '',
+        timezone: '', screenWidth: 0, screenHeight: 0
+      },
+      events: []
+    };
+
+    // ── Persistence helpers ───────────────────────────────────────────────
+    function saveJourney() {
+      try { localStorage.setItem('pendingJourney', JSON.stringify(journey)); } catch (_je) { }
+    }
+
+    function _jClearPending() {
+      try {
+        localStorage.removeItem('pendingJourney');
+        localStorage.removeItem('unfinished_session_id');
+      } catch (_je) { }
+    }
+
+    function uploadJourney(j) {
+      if (!_supaClient) return Promise.resolve(false);
+      return _supaClient.from('game_sessions').insert({
+        session_id:   j.sessionId,
+        completed:    true,
+        completed_at: j.endedAt,
+        journey:      j
+      }).then(function (res) {
+        return !res.error;
+      }).catch(function () { return false; });
+    }
+
+    // ── Record one event into the journey timeline ────────────────────────
+    function jRecordEvent(evt) {
+      try {
+        evt.sequence = ++journey.eventSequence;
+        journey.events.push(evt);
+      } catch (_je) { }
+    }
+
+    // ── Initialise a brand-new session ────────────────────────────────────
+    function _jStartNewSession() {
+      journey.sessionId     = _jUUID();
+      journey.startedAt     = '';
+      journey.endedAt       = '';
+      journey.totalDuration = 0;
+      journey.completed     = false;
+      journey.eventSequence = 0;
+      journey.events        = [];
+      try { localStorage.setItem('unfinished_session_id', journey.sessionId); } catch (_je) { }
+    }
+
+    // ── Bootstrap: runs once at page load ────────────────────────────────
+    //   Checks localStorage for a pending journey and acts accordingly.
+    (function _jBootstrap() {
+      var raw = null;
+      try { raw = localStorage.getItem('pendingJourney'); } catch (_je) { }
+      var pending = null;
+      try { if (raw) pending = JSON.parse(raw); } catch (_je) { }
+
+      if (pending) {
+        if (pending.completed) {
+          /* Completed journey never uploaded — retry silently, then start fresh */
+          uploadJourney(pending).then(function (ok) {
+            if (ok) _jClearPending();
+          });
+          _jStartNewSession();
+        } else {
+          /* Unfinished session — resume it */
+          journey = pending;
+          jRecordEvent({
+            type: 'system', id: 'session_resumed',
+            shownAt: new Date().toISOString(),
+            closedAt: new Date().toISOString(),
+            durationSeconds: 0,
+            reason: 'Recovered from localStorage'
+          });
+          saveJourney();
+        }
+        return;
+      }
+      _jStartNewSession();
+    })();
+
+    /* ─── End Journey Tracking infrastructure ──────────────────────────── */
+
     /* ── Game asset preloader — runs immediately, hides loader when ready ── */
     (function () {
       var ASSETS = [
@@ -4660,6 +4785,23 @@
         if (!loader) return;
         loader.classList.add('gl-hide');
         setTimeout(function () { loader.style.display = 'none'; }, 950);
+        /* Journey: capture game-start timestamp and device fingerprint */
+        try {
+          journey.startedAt = new Date().toISOString();
+          journey.device = {
+            browser:      navigator.userAgent || '',
+            platform:     (navigator.userAgentData
+              ? navigator.userAgentData.platform
+              : (navigator.platform || '')) || '',
+            language:     navigator.language || '',
+            timezone:     (typeof Intl !== 'undefined'
+              ? Intl.DateTimeFormat().resolvedOptions().timeZone
+              : '') || '',
+            screenWidth:  (typeof screen !== 'undefined' ? screen.width  : window.innerWidth)  || 0,
+            screenHeight: (typeof screen !== 'undefined' ? screen.height : window.innerHeight) || 0
+          };
+          saveJourney();
+        } catch (_je) { }
       }
 
       function onOne() {
@@ -5510,10 +5652,20 @@ Now it's time for the part everyone has been waiting for.`
 
       g4.elements.sort(() => Math.random() - 0.5);
       document.getElementById('g4Finale').classList.remove('show');
+      try { journey._lv4Start = Date.now(); } catch (_je) { }
       game4El.classList.add('show');
     }
 
     function endGame4() {
+      try {
+        var _lv4End = Date.now();
+        jRecordEvent({ type: 'level', id: 'level_4_surprise',
+          shownAt: journey._lv4Start ? new Date(journey._lv4Start).toISOString() : '',
+          closedAt: new Date(_lv4End).toISOString(),
+          durationSeconds: journey._lv4Start ? parseFloat(((_lv4End - journey._lv4Start) / 1000).toFixed(1)) : 0,
+          closedBy: 'game_completed' });
+        saveJourney();
+      } catch (_je) { }
       game4El.classList.remove('show');
       completeCurrent();
     }
@@ -5581,7 +5733,7 @@ Now it's time for the part everyone has been waiting for.`
       setTimeout(() => {
         try { confettiBurst(); } catch (e) { }
         setTimeout(() => { try { confettiBurst(); } catch (e) { } }, 700);
-        setTimeout(() => { try { confettiBurst(); } catch (e) { } }, 1500);
+        // setTimeout(() => { try { confettiBurst(); } catch (e) { } }, 1500);
         for (let i = 0; i < 7; i++) {
           setTimeout(() => {
             try {
@@ -6307,6 +6459,7 @@ Now it's time for the part everyone has been waiting for.`
       g1.finish.classList.remove('show', 'btn-start');
       g1BuildAurora();   // inject 5 aurora bands + snow
       g1MakeStars();     // rich star field
+      try { journey._lv1Start = Date.now(); } catch (_je) { }
       g1.el.classList.add('show');
       g1.running = true; g1.last = performance.now();
 
@@ -6442,6 +6595,15 @@ Now it's time for the part everyone has been waiting for.`
       g1.running = false; cancelAnimationFrame(g1.raf);
       g1.field.innerHTML = ''; g1.items = [];
       levelStats[0] = { hearts: g1.hearts, shoot: g1.shoot, stars: g1.stars, crystals: g1.crystals, score: g1.score };
+      try {
+        var _lv1End = Date.now();
+        jRecordEvent({ type: 'level', id: 'level_1_northern_lights',
+          shownAt: journey._lv1Start ? new Date(journey._lv1Start).toISOString() : '',
+          closedAt: new Date(_lv1End).toISOString(),
+          durationSeconds: journey._lv1Start ? parseFloat(((_lv1End - journey._lv1Start) / 1000).toFixed(1)) : 0,
+          closedBy: 'game_completed' });
+        saveJourney();
+      } catch (_je) { }
       /* Award exactly the hearts the player collected during gameplay */
       window.fcHearts = (window.fcHearts || 0) + g1.hearts;
       g1.el.classList.remove('show');
@@ -6739,6 +6901,7 @@ Now it's time for the part everyone has been waiting for.`
       g2.cannonX = window.innerWidth / 2; g2.muzzleY = window.innerHeight - 190;
       moveCannon(g2.cannonX);
       layoutTargets();
+      try { journey._lv2Start = Date.now(); } catch (_je) { }
       g2.el.classList.add('show');
       g2.catchEl.addEventListener('pointerdown', g2Down);
       window.addEventListener('pointermove', g2Move);
@@ -6952,6 +7115,15 @@ Now it's time for the part everyone has been waiting for.`
       /* Resume decorative map animations that were paused during gameplay */
       G2_DECOR_ELS.forEach(function (el) { el.style.animationPlayState = ''; });
       levelStats[1] = { choc: g2.choc, hearts: g2.hearts, score: g2.score };
+      try {
+        var _lv2End = Date.now();
+        jRecordEvent({ type: 'level', id: 'level_2_swiss_cannon',
+          shownAt: journey._lv2Start ? new Date(journey._lv2Start).toISOString() : '',
+          closedAt: new Date(_lv2End).toISOString(),
+          durationSeconds: journey._lv2Start ? parseFloat(((_lv2End - journey._lv2Start) / 1000).toFixed(1)) : 0,
+          closedBy: 'game_completed' });
+        saveJourney();
+      } catch (_je) { }
       /* Award = hearts the player shot with the cannon (max 5) */
       window.fcHearts = (window.fcHearts || 0) + Math.min(5, g2.hearts);
       g2.el.classList.remove('show');
@@ -7152,6 +7324,7 @@ Now it's time for the part everyone has been waiting for.`
         moveBowl(g3.bowlX);
       });
 
+      try { journey._lv3Start = Date.now(); } catch (_je) { }
       g3.el.classList.add('show');
       g3.isDragging = false;
       g3.catchEl.addEventListener('pointerdown', g3Down);
@@ -7658,6 +7831,15 @@ Now it's time for the part everyone has been waiting for.`
       g3.win.classList.remove('show');
       g3.atmos.innerHTML = ''; g3.steam.innerHTML = '';
       levelStats[2] = { ingredients: g3.count, score: g3.score };
+      try {
+        var _lv3End = Date.now();
+        jRecordEvent({ type: 'level', id: 'level_3_japan_ramen',
+          shownAt: journey._lv3Start ? new Date(journey._lv3Start).toISOString() : '',
+          closedAt: new Date(_lv3End).toISOString(),
+          durationSeconds: journey._lv3Start ? parseFloat(((_lv3End - journey._lv3Start) / 1000).toFixed(1)) : 0,
+          closedBy: 'game_completed' });
+        saveJourney();
+      } catch (_je) { }
       /* Chapter 3: no additional hearts (total 10 already earned from Ch1+Ch2) */
       g3.el.classList.remove('show');
       completeCurrent();
@@ -8235,7 +8417,10 @@ Now it's time for the part everyone has been waiting for.`
           });
         }
 
-        async function fcLine(speaker, color, text) {
+        async function fcLine(speaker, color, text, eventId) {
+          /* Journey: record when this line is first shown to the player */
+          var _jShownAt = eventId ? new Date().toISOString() : null;
+
           /* Elevate speaker container so they pop forward while talking */
           var _spk = FC_SPK_MAP[speaker];
           if (_spk) {
@@ -8262,6 +8447,22 @@ Now it's time for the part everyone has been waiting for.`
               el.style.zIndex = String(_spk.base);
               el.style.filter = '';
             });
+          }
+
+          /* Journey: append completed message event (non-blocking) */
+          if (eventId && _jShownAt) {
+            try {
+              var _jClosedAt = new Date().toISOString();
+              jRecordEvent({
+                type: 'message', id: eventId,
+                speaker: speaker, message: text,
+                shownAt: _jShownAt, closedAt: _jClosedAt,
+                durationSeconds: parseFloat(
+                  ((new Date(_jClosedAt) - new Date(_jShownAt)) / 1000).toFixed(1)),
+                closedBy: 'tap_to_continue'
+              });
+              saveJourney();
+            } catch (_je) { }
           }
         }
 
@@ -9004,11 +9205,11 @@ Now it's time for the part everyone has been waiting for.`
           fcEnterSpirit('spiritlevel4ave.webp');
           await fcDelay(800);
 
-          await fcLine('Spirit Guide', FC_COL.spirit, 'Welcome!');
-          await fcLine('Spirit Guide', FC_COL.spirit, 'There are some very special guests waiting to celebrate with you.');
-          await fcLine('Spirit Guide', FC_COL.spirit, 'Some are shy...');
-          await fcLine('Spirit Guide', FC_COL.spirit, 'Some are loud...');
-          await fcLine('Spirit Guide', FC_COL.spirit, 'And one of them is definitely late.');
+          await fcLine('Spirit Guide', FC_COL.spirit, 'Welcome!', 'spirit_intro_1');
+          await fcLine('Spirit Guide', FC_COL.spirit, 'There are some very special guests waiting to celebrate with you.', 'spirit_intro_2');
+          await fcLine('Spirit Guide', FC_COL.spirit, 'Some are shy...', 'spirit_intro_3');
+          await fcLine('Spirit Guide', FC_COL.spirit, 'Some are loud...', 'spirit_intro_4');
+          await fcLine('Spirit Guide', FC_COL.spirit, 'And one of them is definitely late.', 'spirit_intro_5');
 
           fcDlgSpkr.textContent = 'Spirit Guide';
           fcDlgSpkr.style.color = FC_COL.spirit;
@@ -9017,7 +9218,16 @@ Now it's time for the part everyone has been waiting for.`
           fcDlgTap.style.display = 'none';
           await fcTypewriter(fcDlgTxt, 'Would you like to meet them?');
 
+          var _p1ChoiceShownAt = new Date().toISOString();
           var choice = await fcChoice('Proceed ✨', 'Close ✖');
+          try {
+            jRecordEvent({ type: 'game', id: 'finale_choice',
+              speaker: 'Spirit Guide', message: 'Would you like to meet them?',
+              shownAt: _p1ChoiceShownAt, closedAt: new Date().toISOString(),
+              durationSeconds: parseFloat(((Date.now() - new Date(_p1ChoiceShownAt)) / 1000).toFixed(1)),
+              closedBy: choice === 'b' ? 'close_button' : 'proceed_button' });
+            saveJourney();
+          } catch (_je) { }
           if (choice === 'b') { fcCloseGame(); return false; }
           fcHideDlg();
 
@@ -9039,15 +9249,15 @@ Now it's time for the part everyone has been waiting for.`
           fcEnterNaruto('narutopeeking.webp');
           await fcDelay(800);
 
-          await fcLine('Naruto', FC_COL.naruto, 'Happy Birthday Kavyaa!');
-          await fcLine('Naruto', FC_COL.naruto, "I couldn't miss this special day!");
+          await fcLine('Naruto', FC_COL.naruto, 'Happy Birthday Kavyaa!', 'naruto_arrive_1');
+          await fcLine('Naruto', FC_COL.naruto, "I couldn't miss this special day!", 'naruto_arrive_2');
 
           await fcSwapCharImg(fcImgNaruto, 'thumbsupnaruto.webp');
-          await fcLine('Naruto', FC_COL.naruto, 'And honestly... the ramen was amazing!');
+          await fcLine('Naruto', FC_COL.naruto, 'And honestly... the ramen was amazing!', 'naruto_arrive_3');
 
           await fcSwapCharImg(fcImgNaruto, 'narutoheart.webp');
           fcFloatHearts(6);
-          await fcLine('Naruto', FC_COL.naruto, 'I hope your birthday is filled with happiness, laughter, and wonderful memories!');
+          await fcLine('Naruto', FC_COL.naruto, 'I hope your birthday is filled with happiness, laughter, and wonderful memories!', 'naruto_arrive_4');
 
           await fcNarutoToStage();
           fcHideDlg();
@@ -9063,8 +9273,8 @@ Now it's time for the part everyone has been waiting for.`
           fcSpiritPoint.style.transition = 'opacity 0.3s ease';
           fcSpiritPoint.style.opacity = '1';
           await fcDelay(400);
-          await fcLine('Spirit Guide', FC_COL.spirit, 'Looks like someone is hiding...');
-          await fcLine('Spirit Guide', FC_COL.spirit, 'Can you help bring them out?');
+          await fcLine('Spirit Guide', FC_COL.spirit, 'Looks like someone is hiding...', 'spirit_shy_1');
+          await fcLine('Spirit Guide', FC_COL.spirit, 'Can you help bring them out?', 'spirit_shy_2');
           fcHideDlg();
           /* Spirit steps back — she fades before the tapping begins */
           fcSpiritPoint.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
@@ -9114,15 +9324,23 @@ Now it's time for the part everyone has been waiting for.`
           await fcDelay(700);
 
           await fcSwapCharImg(fcImgDS, 'demonslayerwelcome.webp');
-          await fcLine('Demon Slayer', FC_COL.ds, "You're so beautiful that we don't even know what to say... It's making us too shy to come out..., Happy Birthday Beautifull... We really mean it.");
+          await fcLine('Demon Slayer', FC_COL.ds, "You're so beautiful that we don't even know what to say... It's making us too shy to come out..., Happy Birthday Kavyaa... We really mean it.", 'ds_reveal_1');
 
           await fcSwapCharImg(fcImgDS, 'demonslayerheart.webp');
           fcFloatHearts(5);
-          await fcLine('Demon Slayer', FC_COL.ds, "We're sending all our love to the birthday girl!");
+          await fcLine('Demon Slayer', FC_COL.ds, "We're sending all our love to the birthday girl!", 'ds_reveal_2');
 
           /* Heart pop — DS (3 hearts) */
+          var _hp4ShownAt = new Date().toISOString();
           await fcShowHeartPop(fcDemonSlayerEl, 'rgba(180,60,255,.8)', 3,
             '❤️ Pop the hearts to gift your love to the Demon Slayers!');
+          try {
+            jRecordEvent({ type: 'game', id: 'heart_pop_ds',
+              shownAt: _hp4ShownAt, closedAt: new Date().toISOString(),
+              durationSeconds: parseFloat(((Date.now() - new Date(_hp4ShownAt)) / 1000).toFixed(1)),
+              closedBy: 'heart_pop' });
+            saveJourney();
+          } catch (_je) { }
 
           await fcDSToStage();
           fcHideDlg();
@@ -9131,8 +9349,8 @@ Now it's time for the part everyone has been waiting for.`
         /* ---- Phase 5: Naruto Reaction ---- */
         async function fcPhase5_NarutoReaction() {
           await fcSwapCharImg(fcImgNaruto, 'narutowaving.webp');
-          await fcLine('Naruto', FC_COL.naruto, 'See?');
-          await fcLine('Naruto', FC_COL.naruto, "I told you everyone wanted to come!");
+          await fcLine('Naruto', FC_COL.naruto, 'See?', 'naruto_react_1');
+          await fcLine('Naruto', FC_COL.naruto, "I told you everyone wanted to come!", 'naruto_react_2');
           await fcSwapCharImg(fcImgNaruto, 'narutoheart.webp');
           fcHideDlg();
         }
@@ -9143,15 +9361,23 @@ Now it's time for the part everyone has been waiting for.`
           fcEnterOP('onepiecewelcome-Photoroom.webp');
           await fcDelay(800);
 
-          await fcLine('One Piece Crew', FC_COL.op, "YOHOHOHO! We sailed all four seas to be here — Happy Birthday Kavyaa!!");
+          await fcLine('One Piece Crew', FC_COL.op, "YOHOHOHO! We sailed all four seas to be here — Happy Birthday Kavyaa!!", 'op_arrive_1');
 
           await fcSwapCharImg(fcImgOP, 'onepieceheart-Photoroom.webp');
           fcFloatHearts(6);
-          await fcLine('One Piece Crew', FC_COL.op, "Our love and wishes are always with you!");
+          await fcLine('One Piece Crew', FC_COL.op, "Our love and wishes are always with you!", 'op_arrive_2');
 
           /* Heart pop — One Piece (3 hearts) */
+          var _hp6ShownAt = new Date().toISOString();
           await fcShowHeartPop(fcOnePieceEl, 'rgba(255,160,40,.8)', 3,
             '❤️ Pop the hearts to send your wishes to the Straw Hat Pirates!');
+          try {
+            jRecordEvent({ type: 'game', id: 'heart_pop_op',
+              shownAt: _hp6ShownAt, closedAt: new Date().toISOString(),
+              durationSeconds: parseFloat(((Date.now() - new Date(_hp6ShownAt)) / 1000).toFixed(1)),
+              closedBy: 'heart_pop' });
+            saveJourney();
+          } catch (_je) { }
 
           await fcOPToStage();
           fcHideDlg();
@@ -9162,16 +9388,13 @@ Now it's time for the part everyone has been waiting for.`
           /* OP faces toward DS — DS still in normal heart pose for the opening line */
           await fcSwapCharImg(fcImgOP, 'onepiecerightside-Photoroom.webp');
           await fcDelay(400);
-          fcBg('radial-gradient(ellipse at 85% 50%, #001530 0%, #050010 100%)');
-          await fcLine('One Piece Crew', FC_COL.op, "We love the birthday girl more than anyone!");
+
+          await fcLine('One Piece Crew', FC_COL.op, "We love the birthday girl more than anyone!", 'rivalry_1');
           /* DS turns to face OP, then fires back */
           await fcSwapCharImg(fcImgDS, 'demonslayerrightview.webp');
-          fcBg('radial-gradient(ellipse at 15% 50%, #1a0020 0%, #050008 100%)');
-          await fcLine('Demon Slayer', FC_COL.ds, "No chance. We love her even more!");
-          fcBg('radial-gradient(ellipse at 85% 50%, #001530 0%, #050010 100%)');
-          await fcLine('One Piece Crew', FC_COL.op, "Impossible — our love is as vast as the Grand Line!");
-          fcBg('radial-gradient(ellipse at 15% 50%, #1a0020 0%, #050008 100%)');
-          await fcLine('Demon Slayer', FC_COL.ds, "You couldn't survive one night against a demon.");
+          await fcLine('Demon Slayer', FC_COL.ds, "No chance. We love her even more!", 'rivalry_2');
+          await fcLine('One Piece Crew', FC_COL.op, "Impossible — our love is as vast as the Grand Line!", 'rivalry_3');
+          await fcLine('Demon Slayer', FC_COL.ds, "You couldn't survive one night against a demon.", 'rivalry_4');
 
           fcHideDlg();
         }
@@ -9181,10 +9404,10 @@ Now it's time for the part everyone has been waiting for.`
           // fcBounce(fcImgNaruto);
           await fcSwapCharImg(fcImgNaruto, 'narutohiss.webp');
           await fcDelay(200);
-          await fcLine('Naruto', FC_COL.naruto, 'HEY!');
+          await fcLine('Naruto', FC_COL.naruto, 'HEY!', 'naruto_break_1');
           fcBounce(fcImgNaruto);
-          await fcLine('Naruto', FC_COL.naruto, "Don't start fighting already!");
-          await fcLine('Naruto', FC_COL.naruto, "This is a birthday party! Save the rivalry for later, dattebayo!");
+          await fcLine('Naruto', FC_COL.naruto, "Don't start fighting already!", 'naruto_break_2');
+          await fcLine('Naruto', FC_COL.naruto, "This is a birthday party! Save the rivalry for later, dattebayo!", 'naruto_break_3');
           await Promise.all([
             fcSwapCharImg(fcImgDS, 'demonslayerheart.webp'),
             fcSwapCharImg(fcImgOP, 'onepieceheart-Photoroom.webp'),
@@ -9194,7 +9417,7 @@ Now it's time for the part everyone has been waiting for.`
           await fcDelay(300);
           await fcSwapCharImg(fcImgNaruto, 'narutoheart.webp');
           fcBounce(fcImgNaruto);
-          await fcLine('Naruto', FC_COL.naruto, "Heh... this is gonna be the best birthday ever, believe it!");
+          await fcLine('Naruto', FC_COL.naruto, "Heh... this is gonna be the best birthday ever, believe it!", 'naruto_break_4');
           fcHideDlg();
         }
 
@@ -9204,8 +9427,8 @@ Now it's time for the part everyone has been waiting for.`
           fcImgSpiritPoint.src = 'spirituppoint.webp';
           fcSpiritPoint.style.opacity = '1';
           await fcDelay(300);
-          await fcLine('Spirit Guide', FC_COL.spirit, 'Wait...');
-          await fcLine('Spirit Guide', FC_COL.spirit, 'I sense someone very powerful arriving from above...');
+          await fcLine('Spirit Guide', FC_COL.spirit, 'Wait...', 'spirit_warn_1');
+          await fcLine('Spirit Guide', FC_COL.spirit, 'I sense someone very powerful arriving from above...', 'spirit_warn_2');
           fcHideDlg();
         }
 
@@ -9252,8 +9475,8 @@ Now it's time for the part everyone has been waiting for.`
           fcBounce(fcImgGojo);
           await fcDelay(200);
 
-          await fcLine('Gojo Satoru', FC_COL.gojo, "I couldn't let a day this special pass without seeing you.");
-          await fcLine('Gojo Satoru', FC_COL.gojo, "Looking this gorgeous on your birthday? You're making it pretty hard for me to keep my cool.");
+          await fcLine('Gojo Satoru', FC_COL.gojo, "I couldn't let a day this special pass without seeing you.", 'gojo_arrive_1');
+          await fcLine('Gojo Satoru', FC_COL.gojo, "Looking this gorgeous on your birthday? You're making it pretty hard for me to keep my cool.", 'gojo_arrive_2');
 
           /* Lower DS so they look like they are standing at ground level looking up */
           fcDS.style.transition = 'bottom 0.5s ease';
@@ -9262,15 +9485,13 @@ Now it's time for the part everyone has been waiting for.`
 
           /* DS looks up at the mysterious arrival */
           await fcSwapCharImg(fcImgDS, 'demonslayrupview.webp');
-          fcBg('radial-gradient(ellipse at 15% 50%, #1a0020 0%, #050008 100%)');
-          await fcLine('Demon Slayer', FC_COL.ds, "Wait... who's that?");
-          await fcLine('Demon Slayer', FC_COL.ds, "Why is he hanging from the sky?!");
+          await fcLine('Demon Slayer', FC_COL.ds, "Wait... who's that?", 'gojo_arrive_3');
+          await fcLine('Demon Slayer', FC_COL.ds, "Why is he hanging from the sky?!", 'gojo_arrive_4');
 
           /* OP reacts while DS is still looking up */
-          fcBg('radial-gradient(ellipse at 85% 50%, #001530 0%, #050010 100%)');
-          await fcLine('One Piece Crew', FC_COL.op, "Forget the guy in the sky...");
-          await fcLine('One Piece Crew', FC_COL.op, "Have you seen how beautiful the birthday girl is?");
-          await fcLine('One Piece Crew', FC_COL.op, "She's stealing our attention!");
+          await fcLine('One Piece Crew', FC_COL.op, "Forget the guy in the sky...", 'gojo_arrive_5');
+          await fcLine('One Piece Crew', FC_COL.op, "Have you seen how beautiful the birthday girl is?", 'gojo_arrive_6');
+          await fcLine('One Piece Crew', FC_COL.op, "She's stealing our attention!", 'gojo_arrive_7');
           fcFloatHearts(5);   /* image hearts on OP beauty reaction */
 
           /* Restore DS position and image simultaneously */
@@ -9282,17 +9503,25 @@ Now it's time for the part everyone has been waiting for.`
 
           /* Existing upside-down reveal sequence (unchanged) */
           await fcDelay(500);
-          await fcLine('Gojo Satoru', FC_COL.gojo, "Well well well... a birthday girl who cleared every level? Impressive kavyaa.");
+          await fcLine('Gojo Satoru', FC_COL.gojo, "Well well well... a birthday girl who cleared every level? Impressive kavyaa.", 'gojo_arrive_8');
 
           await fcSwapCharImg(fcImgGojo, 'gojoheart-Photoroom.webp');
           fcFloatHearts(5);
-          await fcLine('Gojo Satoru', FC_COL.gojo, "Happy Birthday kavyaa! Careful with that smile... it's dangerously charming. May every dream you have come true.");
-          await fcLine('Gojo Satoru', FC_COL.gojo, "Do not tell anyone I said that. I have a reputation to maintain.");
-          await fcLine('Gojo Satoru', FC_COL.gojo, "Looks like there are still a couple of hearts waiting... I'll gladly protect them.");
+          await fcLine('Gojo Satoru', FC_COL.gojo, "Happy Birthday kavyaa! Careful with that smile... it's dangerously charming. May every dream you have come true.", 'gojo_arrive_9');
+          await fcLine('Gojo Satoru', FC_COL.gojo, "Do not tell anyone I said that. I have a reputation to maintain.", 'gojo_arrive_10');
+          await fcLine('Gojo Satoru', FC_COL.gojo, "Looks like there are still a couple of hearts waiting... I'll gladly protect them.", 'gojo_arrive_11');
 
           /* Heart pop — Gojo (2 hearts) */
+          var _hp10ShownAt = new Date().toISOString();
           await fcShowHeartPop(fcGojoEl, 'rgba(80,200,255,.8)', 2,
             '❤️ Pop the hearts and let Gojo protect your wishes!');
+          try {
+            jRecordEvent({ type: 'game', id: 'heart_pop_gojo',
+              shownAt: _hp10ShownAt, closedAt: new Date().toISOString(),
+              durationSeconds: parseFloat(((Date.now() - new Date(_hp10ShownAt)) / 1000).toFixed(1)),
+              closedBy: 'heart_pop' });
+            saveJourney();
+          } catch (_je) { }
 
           await fcGojoToStage();
           fcHideDlg();
@@ -9303,10 +9532,10 @@ Now it's time for the part everyone has been waiting for.`
           await fcSwapCharImg(fcImgNaruto, 'narutoheart.webp');
           fcBounce(fcImgNaruto);
           await fcDelay(200);
-          await fcLine('Naruto', FC_COL.naruto, 'WHOA!');
+          await fcLine('Naruto', FC_COL.naruto, 'WHOA!', 'naruto_fanboy_1');
           fcBounce(fcImgNaruto);
-          await fcLine('Naruto', FC_COL.naruto, "Even Gojo showed up — this party is incredible!");
-          await fcLine('Naruto', FC_COL.naruto, "Best birthday party I've ever been to, believe it!!");
+          await fcLine('Naruto', FC_COL.naruto, "Even Gojo showed up — this party is incredible!", 'naruto_fanboy_2');
+          await fcLine('Naruto', FC_COL.naruto, "Best birthday party I've ever been to, believe it!!", 'naruto_fanboy_3');
           fcHideDlg();
         }
 
@@ -9332,20 +9561,28 @@ Now it's time for the part everyone has been waiting for.`
           fcImgRengoku.style.transition = 'filter 0.4s ease';
           fcImgRengoku.style.filter = 'drop-shadow(0 8px 24px rgba(0,0,0,0.7)) drop-shadow(0 0 30px #ff6030) drop-shadow(0 0 70px #ff8c00)';
 
-          await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "SORRY I'M LATE!");
-          await fcLine('Naruto', FC_COL.naruto, "You almost missed the party!!");
+          await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "SORRY I’M LATE!", 'rengoku_arrive_1');
+          await fcLine('Naruto', FC_COL.naruto, "You almost missed the party!!", 'rengoku_arrive_2');
 
           /* ── Step 2: Admiration — rengokuheartlarge ───────────────────────────── */
           await fcSwapCharImg(fcImgRengoku, 'rengokuheartlarge.webp');
           fcFloatHearts(6);
-          await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "HOW COULD ANYONE MISS THE PARTY? SHE'S SO ADORABLE AND ABSOLUTELY WONDERFUL!");
-          await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "HAPPY BIRTHDAY KAVYAA! LIVE EACH DAY WITH PASSION, TREASURE EVERY SMILE, AND NEVER FORGET HOW WONDERFUL YOU ARE!");
-          await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "These final hearts shall burn brighter than any flame!");
-          await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "I'll keep them safe forever!");
+          await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "HOW COULD ANYONE MISS THE PARTY? SHE’S SO ADORABLE AND ABSOLUTELY WONDERFUL!", 'rengoku_arrive_3');
+          await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "HAPPY BIRTHDAY KAVYAA! LIVE EACH DAY WITH PASSION, TREASURE EVERY SMILE, AND NEVER FORGET HOW WONDERFUL YOU ARE!", 'rengoku_arrive_4');
+          await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "These final hearts shall burn brighter than any flame!", 'rengoku_arrive_5');
+          await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "I’ll keep them safe forever!", 'rengoku_arrive_6');
 
           /* Heart pop — Rengoku (2 hearts) */
+          var _hp12ShownAt = new Date().toISOString();
           await fcShowHeartPop(fcRengokuEl, 'rgba(255,100,40,.8)', 2,
             '❤️ Pop the final hearts and let Rengoku carry them with his eternal flame!');
+          try {
+            jRecordEvent({ type: 'game', id: 'heart_pop_rengoku',
+              shownAt: _hp12ShownAt, closedAt: new Date().toISOString(),
+              durationSeconds: parseFloat(((Date.now() - new Date(_hp12ShownAt)) / 1000).toFixed(1)),
+              closedBy: 'heart_pop' });
+            saveJourney();
+          } catch (_je) { }
 
           /* Infinite Heart Collection cinematic */
           await fcShowRengokuInfiniteGift(fcRengokuEl);
@@ -9353,11 +9590,11 @@ Now it's time for the part everyone has been waiting for.`
           /* ── Step 3: Lovestruck — rengokuhearthandlarge ───────────────────────── */
           await fcSwapCharImg(fcImgRengoku, 'rengokuhearthandlarge.webp');
           fcFloatHearts(8);
-          await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "I FEEL MY HEART FLARING UP... YOU ARE FAR TOO PRECIOUS TO LOOK AT DIRECTLY!");
+          await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "I FEEL MY HEART FLARING UP... YOU ARE FAR TOO PRECIOUS TO LOOK AT DIRECTLY!", 'rengoku_arrive_7');
 
           /* ── Step 4: Final mini cute state — rengokuheart ────────────────────── */
           await fcSwapCharImg(fcImgRengoku, 'rengokuheart.webp');
-          await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "I DIDN’T EXPECT IT... BUT YOUR SMILE HAS CAPTURED MY HEART COMPLETELY.");
+          await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "I DIDN’T EXPECT IT... BUT YOUR SMILE HAS CAPTURED MY HEART COMPLETELY.", 'rengoku_arrive_8');
 
           /* ── Step 5: Return to hearthand — warm final reveal ─────────────────── */
           await fcSwapCharImg(fcImgRengoku, 'rengokuhearthandlarge.webp');
@@ -9370,7 +9607,7 @@ Now it's time for the part everyone has been waiting for.`
         async function fcPhase13_RengokuHeart() {
           /* Rengoku character already shows rengokuheart.webp (entered in Phase 12). */
           await fcDelay(400);
-          await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "HAPPY BIRTHDAY KAVYAA! I SINCERELY HOPE EVERY DAY OF YOUR LIFE SHINES WITH WARMTH AND MEANING!");
+          await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "HAPPY BIRTHDAY KAVYAA! I SINCERELY HOPE EVERY DAY OF YOUR LIFE SHINES WITH WARMTH AND MEANING!", 'rengoku_heart_1');
           fcFloatHearts(8);
           fcHideDlg();
         }
@@ -9398,9 +9635,9 @@ Now it's time for the part everyone has been waiting for.`
                 }, d);
               })(fi * 380);
             }
-            setTimeout(function () { confettiBurst(); }, 200);
-            setTimeout(function () { confettiBurst(); }, 800);
-            setTimeout(function () { confettiBurst(); }, 1400);
+            // setTimeout(function () { confettiBurst(); }, 200);
+            // setTimeout(function () { confettiBurst(); }, 800);
+            // setTimeout(function () { confettiBurst(); }, 1400);
           } catch (e) { }
 
           var sparkCols = ['#ffd23c', '#ff3388', '#b060ff', '#33ccff', '#ff9e3c', '#6fc7ff'];
@@ -9427,8 +9664,8 @@ Now it's time for the part everyone has been waiting for.`
           await fcDelay(400);
           fcFloatHearts(12);
 
-          await fcLine('All Together', '#ffffff', "HAPPY BIRTHDAY KAVYAA!");
-          await fcLine('All Together', '#ffffff', "Let this be your promise from all of us—may your journey shine with happiness, your heart stay full of love, and your dreams never stop growing. You are cherished beyond measure.");
+          await fcLine('All Together', '#ffffff', "HAPPY BIRTHDAY KAVYAA!", 'group_celebrate_1');
+          await fcLine('All Together', '#ffffff', "Let this be your promise from all of us—may your journey shine with happiness, your heart stay full of love, and your dreams never stop growing. You are cherished beyond measure.", 'group_celebrate_2');
 
           fcFloatHearts(16);
           fcShake();
@@ -9667,7 +9904,15 @@ Now it's time for the part everyone has been waiting for.`
 
           fcCreator.classList.add('fc-show');
           await fcDelay(600);   /* let card fully fade in before showing slider */
+          var _p16ShownAt = new Date().toISOString();
           await fcCreatorSwipeInteraction();
+          try {
+            jRecordEvent({ type: 'game', id: 'creator_message',
+              shownAt: _p16ShownAt, closedAt: new Date().toISOString(),
+              durationSeconds: parseFloat(((Date.now() - new Date(_p16ShownAt)) / 1000).toFixed(1)),
+              closedBy: 'heart_pop' });
+            saveJourney();
+          } catch (_je) { }
           fcCreator.classList.remove('fc-show');
           await fcDelay(700);
         }
@@ -9677,15 +9922,47 @@ Now it's time for the part everyone has been waiting for.`
           fcBgTint.style.transition = 'background 1.5s ease';
           fcBg('#000');
           await fcDelay(800);
+          var _p17ShownAt = new Date().toISOString();
           fcEnding.classList.add('fc-show');
           /* Wait for Close Journey button */
           await new Promise(function (resolve) {
             var btn = document.getElementById('fcCloseJourneyBtn');
-            if (!btn) { setTimeout(resolve, 6000); return; }
+            if (!btn) {
+              setTimeout(function () {
+                /* No button — auto-complete journey */
+                try {
+                  journey.completed  = true;
+                  journey.endedAt    = new Date().toISOString();
+                  journey.totalDuration = journey.startedAt
+                    ? parseFloat(((new Date(journey.endedAt) - new Date(journey.startedAt)) / 1000).toFixed(1)) : 0;
+                  jRecordEvent({ type: 'game', id: 'thanks_screen',
+                    shownAt: _p17ShownAt, closedAt: journey.endedAt,
+                    durationSeconds: parseFloat(((Date.now() - new Date(_p17ShownAt)) / 1000).toFixed(1)),
+                    closedBy: 'auto_transition' });
+                  saveJourney();
+                  uploadJourney(journey).then(function (ok) { if (ok) _jClearPending(); });
+                } catch (_je) { }
+                resolve();
+              }, 6000);
+              return;
+            }
             var _done = false;
             function go(e) {
               if (_done) return; _done = true;
               if (e && e.cancelable) e.preventDefault();
+              /* Journey: finalise and upload */
+              try {
+                journey.completed  = true;
+                journey.endedAt    = new Date().toISOString();
+                journey.totalDuration = journey.startedAt
+                  ? parseFloat(((new Date(journey.endedAt) - new Date(journey.startedAt)) / 1000).toFixed(1)) : 0;
+                jRecordEvent({ type: 'game', id: 'thanks_screen',
+                  shownAt: _p17ShownAt, closedAt: journey.endedAt,
+                  durationSeconds: parseFloat(((Date.now() - new Date(_p17ShownAt)) / 1000).toFixed(1)),
+                  closedBy: 'close_journey' });
+                saveJourney();  /* persist completed journey immediately */
+                uploadJourney(journey).then(function (ok) { if (ok) _jClearPending(); });
+              } catch (_je) { }
               resolve();
             }
             btn.addEventListener('click', go, { once: true });
@@ -9699,6 +9976,13 @@ Now it's time for the part everyone has been waiting for.`
         /* ==================== ENTRY POINT ==================== */
         async function startFinalCelebration() {
           fc.classList.add('fc-active');
+          /* Journey: mark finale start */
+          try {
+            jRecordEvent({ type: 'system', id: 'finale_started',
+              shownAt: new Date().toISOString(), closedAt: new Date().toISOString(),
+              durationSeconds: 0 });
+            saveJourney();
+          } catch (_je) { }
 
           /* Reset all character containers */
           [fcNaruto, fcDS, fcOP, fcGojoEl, fcRengokuEl, fcSpiritEl, fcSpiritPoint].forEach(function (div) {
