@@ -9388,15 +9388,12 @@ Now it's time for the part everyone has been waiting for.`
           /* OP faces toward DS — DS still in normal heart pose for the opening line */
           await fcSwapCharImg(fcImgOP, 'onepiecerightside-Photoroom.webp');
           await fcDelay(400);
-          fcBg('radial-gradient(ellipse at 85% 50%, #001530 0%, #050010 100%)');
+
           await fcLine('One Piece Crew', FC_COL.op, "We love the birthday girl more than anyone!", 'rivalry_1');
           /* DS turns to face OP, then fires back */
           await fcSwapCharImg(fcImgDS, 'demonslayerrightview.webp');
-          fcBg('radial-gradient(ellipse at 15% 50%, #1a0020 0%, #050008 100%)');
           await fcLine('Demon Slayer', FC_COL.ds, "No chance. We love her even more!", 'rivalry_2');
-          fcBg('radial-gradient(ellipse at 85% 50%, #001530 0%, #050010 100%)');
           await fcLine('One Piece Crew', FC_COL.op, "Impossible — our love is as vast as the Grand Line!", 'rivalry_3');
-          fcBg('radial-gradient(ellipse at 15% 50%, #1a0020 0%, #050008 100%)');
           await fcLine('Demon Slayer', FC_COL.ds, "You couldn't survive one night against a demon.", 'rivalry_4');
 
           fcHideDlg();
@@ -9488,12 +9485,10 @@ Now it's time for the part everyone has been waiting for.`
 
           /* DS looks up at the mysterious arrival */
           await fcSwapCharImg(fcImgDS, 'demonslayrupview.webp');
-          fcBg('radial-gradient(ellipse at 15% 50%, #1a0020 0%, #050008 100%)');
           await fcLine('Demon Slayer', FC_COL.ds, "Wait... who's that?", 'gojo_arrive_3');
           await fcLine('Demon Slayer', FC_COL.ds, "Why is he hanging from the sky?!", 'gojo_arrive_4');
 
           /* OP reacts while DS is still looking up */
-          fcBg('radial-gradient(ellipse at 85% 50%, #001530 0%, #050010 100%)');
           await fcLine('One Piece Crew', FC_COL.op, "Forget the guy in the sky...", 'gojo_arrive_5');
           await fcLine('One Piece Crew', FC_COL.op, "Have you seen how beautiful the birthday girl is?", 'gojo_arrive_6');
           await fcLine('One Piece Crew', FC_COL.op, "She's stealing our attention!", 'gojo_arrive_7');
