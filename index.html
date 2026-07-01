@@ -3748,6 +3748,181 @@
       pointer-events: none;
     }
 
+    /* ── Invitation Login Screen ────────────────────────────────────────────
+       Sits above everything (z-index 999999 > loader's 99999).
+       Background preloading runs silently behind it.
+       Scoped entirely to #glLogin — zero impact on any game element.      */
+
+    @keyframes glLoginIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    @keyframes glSpinner {
+      to { transform: rotate(360deg); }
+    }
+
+    #glLogin {
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      background: radial-gradient(ellipse at center, #080018 0%, #020008 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      animation: glLoginIn 0.55s ease both;
+      transition: opacity 0.9s ease;
+    }
+
+    #glLogin.gl-hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #glLoginCard {
+      width: min(90vw, 420px);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(200, 120, 255, 0.2);
+      border-radius: 24px;
+      padding: clamp(28px, 6vw, 52px) clamp(24px, 5vw, 44px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: clamp(14px, 3vh, 22px);
+      box-shadow:
+        0 0 60px rgba(140, 0, 200, 0.15),
+        0 0 120px rgba(200, 0, 120, 0.08);
+    }
+
+    #glLoginTitle {
+      font-family: Georgia, 'Times New Roman', Times, serif;
+      font-size: clamp(24px, 7vw, 46px);
+      font-weight: 900;
+      background: linear-gradient(90deg, #ffe066, #ff3388, #c080ff, #33ccff, #ffe066);
+      background-size: 300% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmerTitle 2.4s linear infinite;
+      letter-spacing: 4px;
+      text-align: center;
+    }
+
+    #glLoginSub {
+      font-size: clamp(13px, 2.8vw, 17px);
+      color: rgba(255, 220, 255, 0.55);
+      text-align: center;
+      line-height: 1.6;
+      letter-spacing: 0.5px;
+      margin: 0;
+    }
+
+    #glLoginMain,
+    #glLoginFallback {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: clamp(10px, 2.5vh, 16px);
+    }
+
+    #glLoginInput,
+    #glFallbackInput {
+      width: 100%;
+      padding: clamp(12px, 1.8vh, 16px) clamp(16px, 3vw, 22px);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1.5px solid rgba(200, 100, 255, 0.35);
+      border-radius: 50px;
+      color: #fff;
+      font-size: clamp(14px, 3vw, 17px);
+      font-family: inherit;
+      letter-spacing: 1.5px;
+      text-align: center;
+      outline: none;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+      caret-color: #c080ff;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    #glLoginInput::placeholder,
+    #glFallbackInput::placeholder {
+      color: rgba(255, 200, 255, 0.35);
+      letter-spacing: 0.5px;
+    }
+
+    #glLoginInput:focus,
+    #glFallbackInput:focus {
+      border-color: rgba(200, 100, 255, 0.7);
+      box-shadow: 0 0 0 3px rgba(192, 128, 255, 0.12), 0 0 20px rgba(200, 100, 255, 0.2);
+    }
+
+    #glLoginBtn,
+    #glFallbackBtn {
+      width: 100%;
+      background: linear-gradient(135deg, #d4006a, #8800cc);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: clamp(12px, 1.9vh, 16px) clamp(24px, 6vw, 40px);
+      font-size: clamp(14px, 3.2vw, 18px);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      box-shadow: 0 4px 24px rgba(200, 0, 120, 0.45), 0 0 40px rgba(140, 0, 200, 0.2);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    #glLoginBtn:active,
+    #glFallbackBtn:active {
+      transform: scale(0.96);
+      box-shadow: 0 2px 12px rgba(200, 0, 120, 0.5);
+    }
+
+    #glLoginBtn:disabled,
+    #glFallbackBtn:disabled {
+      opacity: 0.55;
+      cursor: default;
+      pointer-events: none;
+    }
+
+    #glLoginError,
+    #glFallbackError {
+      font-size: clamp(12px, 2.5vw, 14px);
+      color: #ff6b9d;
+      text-align: center;
+      min-height: 1.4em;
+      transition: opacity 0.3s ease;
+      opacity: 0;
+      letter-spacing: 0.3px;
+    }
+
+    #glFallbackMsg {
+      font-size: clamp(12px, 2.6vw, 15px);
+      color: rgba(255, 210, 255, 0.6);
+      text-align: center;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .gl-spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: glSpinner 0.65s linear infinite;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
     /* ── Game Loader ──────────────────────────────────────────────────────── */
     #gameLoader {
       position: fixed;
@@ -3883,6 +4058,28 @@
 </head>
 
 <body>
+  <!-- ── Invitation Login Screen ── -->
+  <div id="glLogin" aria-label="Invitation login">
+    <div id="glLoginCard">
+      <div id="glLoginTitle">✨ Welcome ✨</div>
+      <p id="glLoginSub">This journey was prepared for someone very special.</p>
+      <div id="glLoginMain">
+        <input id="glLoginInput" type="text" placeholder="Enter your invitation code"
+               autocomplete="off" autocorrect="off" autocapitalize="off"
+               spellcheck="false" inputmode="text" />
+        <button id="glLoginBtn">Begin Journey</button>
+        <div id="glLoginError"></div>
+      </div>
+      <div id="glLoginFallback" style="display:none">
+        <p id="glFallbackMsg">Unable to verify your invitation right now.<br>Please enter the default access code.</p>
+        <input id="glFallbackInput" type="text" placeholder="Default access code"
+               autocomplete="off" autocorrect="off" autocapitalize="off"
+               spellcheck="false" />
+        <button id="glFallbackBtn">Continue</button>
+        <div id="glFallbackError"></div>
+      </div>
+    </div>
+  </div>
   <!-- ── Game Loading Screen ── -->
   <div id="gameLoader" aria-label="Loading birthday adventure">
     <div id="glTitle" style="font-family: Georgia, 'Times New Roman', Times, serif;">Happy Birthday!</div>
@@ -4697,7 +4894,8 @@
         session_id:   j.sessionId,
         completed:    true,
         completed_at: j.endedAt,
-        journey:      j
+        journey:      j,
+        access_code:  j.user ? j.user.access_code : null
       }).then(function (res) {
         return !res.error;
       }).catch(function () { return false; });
@@ -4757,6 +4955,144 @@
 
     /* ─── End Journey Tracking infrastructure ──────────────────────────── */
 
+    /* ===================================================================
+       INVITATION LOGIN
+       Controls access to the game. Reuses the existing _supaClient.
+       Zero impact on journey tracking, game state, or preloading.
+       The preloader IIFE below starts immediately (background preload).
+       This IIFE wires the login UI and gates the game behind access code.
+       =================================================================== */
+
+    var currentUser = null;        /* populated on successful login, reset on reload */
+    var _loginCompleted = false;   /* used to keep journey.startedAt = login time    */
+
+    (function _initLoginScreen() {
+      var loginEl       = document.getElementById('glLogin');
+      var loginInput    = document.getElementById('glLoginInput');
+      var loginBtn      = document.getElementById('glLoginBtn');
+      var loginError    = document.getElementById('glLoginError');
+      var loginMain     = document.getElementById('glLoginMain');
+      var fallbackEl    = document.getElementById('glLoginFallback');
+      var fallbackInput = document.getElementById('glFallbackInput');
+      var fallbackBtn   = document.getElementById('glFallbackBtn');
+      var fallbackError = document.getElementById('glFallbackError');
+
+      /* Safety: if the element is missing for any reason, let the game through */
+      if (!loginEl) return;
+
+      /* ── UI helpers ─────────────────────────────────────────────────── */
+      function showMainError(msg) {
+        if (!loginError) return;
+        loginError.textContent = msg;
+        loginError.style.opacity = '1';
+      }
+      function clearMainError() {
+        if (!loginError) return;
+        loginError.style.opacity = '0';
+      }
+      function setMainLoading(on) {
+        if (loginBtn) {
+          loginBtn.disabled = on;
+          loginBtn.innerHTML = on
+            ? '<span class="gl-spinner"></span>Verifying…'
+            : 'Begin Journey';
+        }
+        if (loginInput) loginInput.disabled = on;
+      }
+
+      /* ── Called after ANY successful validation path ──────────────── */
+      function onLoginSuccess(user) {
+        currentUser = user;
+        _loginCompleted = true;
+        try {
+          journey.user = { id: user.id, name: user.name, access_code: user.access_code };
+          /* Pin journey.startedAt to login moment — this is the true game start */
+          journey.startedAt = new Date().toISOString();
+          saveJourney();
+        } catch (_le) { }
+
+        /* Fade out and remove the login screen */
+        loginEl.classList.add('gl-hide');
+        setTimeout(function () { loginEl.style.display = 'none'; }, 950);
+      }
+
+      /* ── Show network-failure fallback UI ─────────────────────────── */
+      function showNetworkFallback() {
+        if (loginMain)   loginMain.style.display   = 'none';
+        if (fallbackEl)  fallbackEl.style.display  = 'flex';
+        setTimeout(function () {
+          try { if (fallbackInput) fallbackInput.focus(); } catch (_e) { }
+        }, 120);
+      }
+
+      /* ── Primary validation via Supabase game_users table ──────────── */
+      function doValidate() {
+        var code = (loginInput ? loginInput.value : '').trim();
+        if (!code) { showMainError('Please enter your invitation code.'); return; }
+        clearMainError();
+        setMainLoading(true);
+
+        /* If Supabase client never initialised, treat as network failure */
+        if (!_supaClient) {
+          setMainLoading(false);
+          showNetworkFallback();
+          return;
+        }
+
+        _supaClient
+          .from('game_users')
+          .select('id, name, access_code')
+          .eq('access_code', code)
+          .maybeSingle()
+          .then(function (res) {
+            setMainLoading(false);
+            if (res.error) {
+              /* Hard Supabase/network error — show offline fallback */
+              showNetworkFallback();
+              return;
+            }
+            if (!res.data) {
+              /* Query succeeded but no row matched */
+              showMainError('Invalid invitation code. Please try again.');
+              return;
+            }
+            /* Access code matched — proceed into the game */
+            onLoginSuccess(res.data);
+          })
+          .catch(function () {
+            setMainLoading(false);
+            showNetworkFallback();
+          });
+      }
+
+      /* ── Fallback validation: offline default code KAV001 ──────────── */
+      function doFallbackValidate() {
+        var code = (fallbackInput ? fallbackInput.value : '').trim();
+        if (code === 'KAV001') {
+          onLoginSuccess({ id: null, name: 'Guest', access_code: 'KAV001' });
+        } else {
+          if (fallbackError) fallbackError.textContent = 'Incorrect default access code.';
+        }
+      }
+
+      /* ── Event wiring ───────────────────────────────────────────────── */
+      if (loginBtn) loginBtn.addEventListener('click', doValidate);
+      if (loginInput) loginInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') doValidate();
+      });
+      if (fallbackBtn) fallbackBtn.addEventListener('click', doFallbackValidate);
+      if (fallbackInput) fallbackInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') doFallbackValidate();
+      });
+
+      /* Auto-focus: slight delay avoids mobile keyboard popping on page load */
+      setTimeout(function () {
+        try { if (loginInput) loginInput.focus(); } catch (_e) { }
+      }, 400);
+    })();
+
+    /* ─── End Invitation Login ──────────────────────────────────────────── */
+
     /* ── Game asset preloader — runs immediately, hides loader when ready ── */
     (function () {
       var ASSETS = [
@@ -4785,9 +5121,11 @@
         if (!loader) return;
         loader.classList.add('gl-hide');
         setTimeout(function () { loader.style.display = 'none'; }, 950);
-        /* Journey: capture game-start timestamp and device fingerprint */
+        /* Journey: capture game-start timestamp and device fingerprint.
+           Only set startedAt if login has not already pinned it to login
+           time — onLoginSuccess always stamps it, so we must not overwrite. */
         try {
-          journey.startedAt = new Date().toISOString();
+          if (!journey.startedAt) { journey.startedAt = new Date().toISOString(); }
           journey.device = {
             browser:      navigator.userAgent || '',
             platform:     (navigator.userAgentData
