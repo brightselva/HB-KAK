@@ -3898,7 +3898,9 @@
       font-size: clamp(12px, 2.5vw, 14px);
       color: #ff6b9d;
       text-align: center;
-      min-height: 1.4em;
+      min-height: 0;
+      line-height: 1.65;
+      white-space: pre-line;   /* allows \n line-breaks in error messages */
       transition: opacity 0.3s ease;
       opacity: 0;
       letter-spacing: 0.3px;
@@ -4595,6 +4597,9 @@
           and all the love you deserve.<br><br>
           Have the most wonderful birthday! ❤️
         </div>
+        <div>
+          <h1 style="font-family: Georgia, 'Times New Roman', Times, serif;color: #ffd500;">- From Spirit</h1>
+        </div>
         <button id="g4ContinueBtn" aria-label="Continue to Final Chapter">Continue Journey ✨</button>
       </div>
     </div>
@@ -4897,7 +4902,12 @@
         journey:      j,
         access_code:  j.user ? j.user.access_code : null
       }).then(function (res) {
-        return !res.error;
+        if (!res.error) return true;
+        /* 409 / unique-violation means this session was already successfully
+           uploaded on a previous attempt.  Treat as success so the retry
+           loop ends and pendingJourney is cleared from localStorage.      */
+        if (res.status === 409 || (res.error.code === '23505')) return true;
+        return false;
       }).catch(function () { return false; });
     }
 
@@ -4967,6 +4977,10 @@
     var _loginCompleted = false;   /* used to keep journey.startedAt = login time    */
 
     (function _initLoginScreen() {
+      /* localStorage keys */
+      var LS_CODE = 'anime_access_code';
+      var LS_NAME = 'anime_user_name';
+
       var loginEl       = document.getElementById('glLogin');
       var loginInput    = document.getElementById('glLoginInput');
       var loginBtn      = document.getElementById('glLoginBtn');
@@ -5000,6 +5014,16 @@
         if (loginInput) loginInput.disabled = on;
       }
 
+      /* ── Reveal login screen (called if returning-user check fails) ── */
+      function showLoginScreen() {
+        loginEl.style.animation    = 'none';   /* CSS animation already cancelled */
+        loginEl.style.pointerEvents = '';
+        loginEl.style.opacity      = '1';      /* transition: opacity 0.9s eases in */
+        setTimeout(function () {
+          try { if (loginInput) loginInput.focus(); } catch (_e) {}
+        }, 300);
+      }
+
       /* ── Called after ANY successful validation path ──────────────── */
       function onLoginSuccess(user) {
         currentUser = user;
@@ -5018,11 +5042,35 @@
 
       /* ── Show network-failure fallback UI ─────────────────────────── */
       function showNetworkFallback() {
-        if (loginMain)   loginMain.style.display   = 'none';
-        if (fallbackEl)  fallbackEl.style.display  = 'flex';
+        if (loginMain)  loginMain.style.display  = 'none';
+        if (fallbackEl) fallbackEl.style.display = 'flex';
         setTimeout(function () {
-          try { if (fallbackInput) fallbackInput.focus(); } catch (_e) { }
+          try { if (fallbackInput) fallbackInput.focus(); } catch (_e) {}
         }, 120);
+      }
+
+      /* ── Mark user active in DB then store in localStorage ─────────
+         Called after code validated and is_logged_in === 'N'.
+         Fires the DB UPDATE, then calls onLoginSuccess regardless
+         of whether the update itself succeeded (best-effort).        */
+      function _activateAndLogin(user) {
+        var proceed = function () {
+          try {
+            localStorage.setItem(LS_CODE, user.access_code);
+            localStorage.setItem(LS_NAME, user.name || '');
+          } catch (_le) {}
+          onLoginSuccess(user);
+        };
+        if (!_supaClient) { proceed(); return; }
+        /* Use rpc() instead of update() — rpc sends POST, which is always
+           allowed by CORS. update() sends PATCH which some Supabase CORS
+           configurations block during the preflight OPTIONS request.
+           Requires the activate_user_login(p_access_code text) function
+           to exist in the database (see README / setup notes).          */
+        _supaClient
+          .rpc('activate_user_login', { p_access_code: user.access_code })
+          .then(function () { proceed(); })
+          .catch(function () { proceed(); });   /* never block on update failure */
       }
 
       /* ── Primary validation via Supabase game_users table ──────────── */
@@ -5041,7 +5089,7 @@
 
         _supaClient
           .from('game_users')
-          .select('id, name, access_code')
+          .select('id, name, access_code, is_logged_in')
           .eq('access_code', code)
           .maybeSingle()
           .then(function (res) {
@@ -5053,11 +5101,20 @@
             }
             if (!res.data) {
               /* Query succeeded but no row matched */
-              showMainError('Invalid invitation code. Please try again.');
+              showMainError('Invalid access code.\nPlease check the code and try again.');
               return;
             }
-            /* Access code matched — proceed into the game */
-            onLoginSuccess(res.data);
+            if (res.data.is_logged_in === 'Y') {
+              /* Already active on another device — deny */
+              showMainError(
+                'This access code is already active on another device.\n\n' +
+                'Please continue using the device where you originally logged in.\n\n' +
+                'If you need access on a new device or browser, please contact the birthday girl.'
+              );
+              return;
+            }
+            /* is_logged_in === 'N' — first / fresh login, proceed */
+            _activateAndLogin(res.data);
           })
           .catch(function () {
             setMainLoading(false);
@@ -5069,6 +5126,7 @@
       function doFallbackValidate() {
         var code = (fallbackInput ? fallbackInput.value : '').trim();
         if (code === 'KAV001') {
+          /* Offline fallback — no DB update, no localStorage write */
           onLoginSuccess({ id: null, name: 'Guest', access_code: 'KAV001' });
         } else {
           if (fallbackError) fallbackError.textContent = 'Incorrect default access code.';
@@ -5085,10 +5143,50 @@
         if (e.key === 'Enter') doFallbackValidate();
       });
 
-      /* Auto-focus: slight delay avoids mobile keyboard popping on page load */
-      setTimeout(function () {
-        try { if (loginInput) loginInput.focus(); } catch (_e) { }
-      }, 400);
+      /* ── Returning-user check — runs on every page load ─────────────
+         Reads anime_access_code from localStorage.  If present, verifies
+         against the DB.  If is_logged_in='Y' → same device → skip login.
+         If stale/reset by admin → clear storage → show login screen.
+         The login screen is held at opacity:0 during the async check so
+         returning users never see a flash of the login UI.             */
+      var _storedCode = null;
+      try { _storedCode = localStorage.getItem(LS_CODE); } catch (_e) {}
+
+      if (_storedCode && _supaClient) {
+        /* Freeze login screen before CSS fade-in animation plays */
+        loginEl.style.animation    = 'none';
+        loginEl.style.opacity      = '0';
+        loginEl.style.pointerEvents = 'none';
+
+        _supaClient
+          .from('game_users')
+          .select('id, name, access_code, is_logged_in')
+          .eq('access_code', _storedCode)
+          .maybeSingle()
+          .then(function (res) {
+            if (!res.error && res.data && res.data.is_logged_in === 'Y') {
+              /* Same device confirmed — go straight into the game */
+              onLoginSuccess(res.data);
+            } else {
+              /* Admin reset or stale storage — clear and show login */
+              try {
+                localStorage.removeItem(LS_CODE);
+                localStorage.removeItem(LS_NAME);
+              } catch (_e) {}
+              showLoginScreen();
+            }
+          })
+          .catch(function () {
+            /* Network failure during boot check — show login screen */
+            showLoginScreen();
+          });
+
+      } else {
+        /* No stored code (or no Supabase) — CSS animation shows login normally */
+        setTimeout(function () {
+          try { if (loginInput) loginInput.focus(); } catch (_e) {}
+        }, 400);
+      }
     })();
 
     /* ─── End Invitation Login ──────────────────────────────────────────── */
