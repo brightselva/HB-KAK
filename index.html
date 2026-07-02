@@ -5105,11 +5105,23 @@
               return;
             }
             if (res.data.is_logged_in === 'Y') {
-              /* Already active on another device — deny */
+              /* is_logged_in is already 'Y'.  Check whether this is the
+                 same device by comparing the entered code to localStorage.
+                 If they match, the boot-time check must have failed (e.g.
+                 a transient network error) but this IS the original device
+                 — skip the error and proceed straight into the game.      */
+              var _localCode = null;
+              try { _localCode = localStorage.getItem(LS_CODE); } catch (_e) {}
+              if (_localCode === code) {
+                /* Same device — go directly into the game */
+                onLoginSuccess(res.data);
+                return;
+              }
+              /* Different device — deny */
               showMainError(
                 'This access code is already active on another device.\n\n' +
                 'Please continue using the device where you originally logged in.\n\n' +
-                'If you need access on a new device or browser, please contact the birthday girl.'
+                'If you need access on a new device, please contact the administrator.'
               );
               return;
             }
@@ -5168,16 +5180,15 @@
               /* Same device confirmed — go straight into the game */
               onLoginSuccess(res.data);
             } else {
-              /* Admin reset or stale storage — clear and show login */
-              try {
-                localStorage.removeItem(LS_CODE);
-                localStorage.removeItem(LS_NAME);
-              } catch (_e) {}
+              /* DB returned 'N', no row, or query error.
+                 Per spec: NEVER clear localStorage automatically.
+                 Show the login screen — doValidate will handle re-auth. */
               showLoginScreen();
             }
           })
           .catch(function () {
-            /* Network failure during boot check — show login screen */
+            /* Network failure during boot check — preserve localStorage,
+               show login screen so user can proceed manually.            */
             showLoginScreen();
           });
 
@@ -9939,7 +9950,7 @@ Now it's time for the part everyone has been waiting for.`
 
           /* Existing upside-down reveal sequence (unchanged) */
           await fcDelay(500);
-          await fcLine('Gojo Satoru', FC_COL.gojo, "Well well well... a birthday girl who cleared every level? Impressive kavyaa.", 'gojo_arrive_8');
+          await fcLine('Gojo Satoru', FC_COL.gojo, "Well well well... you cleared every level? Impressive kavyaa.", 'gojo_arrive_8');
 
           await fcSwapCharImg(fcImgGojo, 'gojoheart-Photoroom.webp');
           fcFloatHearts(5);
@@ -10003,7 +10014,7 @@ Now it's time for the part everyone has been waiting for.`
           /* ── Step 2: Admiration — rengokuheartlarge ───────────────────────────── */
           await fcSwapCharImg(fcImgRengoku, 'rengokuheartlarge.webp');
           fcFloatHearts(6);
-          await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "HOW COULD ANYONE MISS THE PARTY? SHE’S SO ADORABLE AND ABSOLUTELY WONDERFUL!", 'rengoku_arrive_3');
+          await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "HOW COULD ANYONE MISS THE PARTY? YOU'RE SO ADORABLE AND ABSOLUTELY WONDERFUL!", 'rengoku_arrive_3');
           await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "HAPPY BIRTHDAY KAVYAA! LIVE EACH DAY WITH PASSION, TREASURE EVERY SMILE, AND NEVER FORGET HOW WONDERFUL YOU ARE!", 'rengoku_arrive_4');
           await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "These final hearts shall burn brighter than any flame!", 'rengoku_arrive_5');
           await fcLine('Rengoku Kyojuro', FC_COL.rengoku, "I’ll keep them safe forever!", 'rengoku_arrive_6');
@@ -10100,8 +10111,8 @@ Now it's time for the part everyone has been waiting for.`
           await fcDelay(400);
           fcFloatHearts(12);
 
-          await fcLine('All Together', '#ffffff', "HAPPY BIRTHDAY KAVYAA!", 'group_celebrate_1');
-          await fcLine('All Together', '#ffffff', "Let this be your promise from all of us—may your journey shine with happiness, your heart stay full of love, and your dreams never stop growing. You are cherished beyond measure.", 'group_celebrate_2');
+          await fcLine('すべて合わせて', '#ffffff', "HAPPY BIRTHDAY KAVYAA!", 'group_celebrate_1');
+          await fcLine('すべて合わせて', '#ffffff', "Let this be your promise from all of us—may your journey shine with happiness, your heart stay full of love, and your dreams never stop growing. You are cherished beyond measure.", 'group_celebrate_2');
 
           fcFloatHearts(16);
           fcShake();
@@ -10332,8 +10343,9 @@ Now it's time for the part everyone has been waiting for.`
             "Some people are remembered for what they do, but some are cherished simply for who they are. " +
             "You have a kind heart, a gentle soul, and the rare ability to care deeply for the people and the world around you. That's something I truly admire.<br><br>" +
             "I hope you never lose that beautiful empathy, even though it means you feel things more deeply than most.<br><br>" +
-            "And I hope there are countless moments this year that make 'Evergreen' play in your mind—not because you're holding onto memories, but because you're creating new ones that make you smile.<br><br>" +
-            "May this birthday bring you peace, laughter, unforgettable adventures, and every happiness you deserve. Keep smiling, keep being yourself, and keep making the world a little brighter just by being in it.<br><br>" +
+            "And I hope there are countless moments this year that make <span style='color:gold; font-weight:bold;'>'Evergreen'</span> play in your mind—not because you're holding onto memories, but because you're creating new ones that make you smile.<br><br>" +
+            "I'd really love to know you better. I know we've only had few conversations, and there's so much more about you I'd love to discover—your stories, your favorite things, and what makes you smile.<br><br>" +
+            "May this birthday bring you peace, laughter, unforgettable adventures, and every happiness you deserve. Keep smiling, keep being yourself.<br><br>" +
             "Happy Birthday, Kavyaa. Wishing you a year as beautiful and genuine as your heart. ❤️<br><br>" +
             "<span style='font-weight:bold; color:gold;'>— The Creator</span>";
 
