@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -3747,183 +3748,6 @@
       pointer-events: none;
     }
 
-    /* ── Invitation Login Screen ────────────────────────────────────────────
-       Sits above everything (z-index 999999 > loader's 99999).
-       Background preloading runs silently behind it.
-       Scoped entirely to #glLogin — zero impact on any game element.      */
-
-    @keyframes glLoginIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-
-    @keyframes glSpinner {
-      to { transform: rotate(360deg); }
-    }
-
-    #glLogin {
-      position: fixed;
-      inset: 0;
-      z-index: 999999;
-      background: radial-gradient(ellipse at center, #080018 0%, #020008 100%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      animation: glLoginIn 0.55s ease both;
-      transition: opacity 0.9s ease;
-    }
-
-    #glLogin.gl-hide {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    #glLoginCard {
-      width: min(90vw, 420px);
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(200, 120, 255, 0.2);
-      border-radius: 24px;
-      padding: clamp(28px, 6vw, 52px) clamp(24px, 5vw, 44px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: clamp(14px, 3vh, 22px);
-      box-shadow:
-        0 0 60px rgba(140, 0, 200, 0.15),
-        0 0 120px rgba(200, 0, 120, 0.08);
-    }
-
-    #glLoginTitle {
-      font-family: Georgia, 'Times New Roman', Times, serif;
-      font-size: clamp(24px, 7vw, 46px);
-      font-weight: 900;
-      background: linear-gradient(90deg, #ffe066, #ff3388, #c080ff, #33ccff, #ffe066);
-      background-size: 300% auto;
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: shimmerTitle 2.4s linear infinite;
-      letter-spacing: 4px;
-      text-align: center;
-    }
-
-    #glLoginSub {
-      font-size: clamp(13px, 2.8vw, 17px);
-      color: rgba(255, 220, 255, 0.55);
-      text-align: center;
-      line-height: 1.6;
-      letter-spacing: 0.5px;
-      margin: 0;
-    }
-
-    #glLoginMain,
-    #glLoginFallback {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: clamp(10px, 2.5vh, 16px);
-    }
-
-    #glLoginInput,
-    #glFallbackInput {
-      width: 100%;
-      padding: clamp(12px, 1.8vh, 16px) clamp(16px, 3vw, 22px);
-      background: rgba(255, 255, 255, 0.05);
-      border: 1.5px solid rgba(200, 100, 255, 0.35);
-      border-radius: 50px;
-      color: #fff;
-      font-size: clamp(14px, 3vw, 17px);
-      font-family: inherit;
-      letter-spacing: 1.5px;
-      text-align: center;
-      outline: none;
-      transition: border-color 0.25s ease, box-shadow 0.25s ease;
-      caret-color: #c080ff;
-      appearance: none;
-      -webkit-appearance: none;
-    }
-
-    #glLoginInput::placeholder,
-    #glFallbackInput::placeholder {
-      color: rgba(255, 200, 255, 0.35);
-      letter-spacing: 0.5px;
-    }
-
-    #glLoginInput:focus,
-    #glFallbackInput:focus {
-      border-color: rgba(200, 100, 255, 0.7);
-      box-shadow: 0 0 0 3px rgba(192, 128, 255, 0.12), 0 0 20px rgba(200, 100, 255, 0.2);
-    }
-
-    #glLoginBtn,
-    #glFallbackBtn {
-      width: 100%;
-      background: linear-gradient(135deg, #d4006a, #8800cc);
-      color: #fff;
-      border: none;
-      border-radius: 50px;
-      padding: clamp(12px, 1.9vh, 16px) clamp(24px, 6vw, 40px);
-      font-size: clamp(14px, 3.2vw, 18px);
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      cursor: pointer;
-      box-shadow: 0 4px 24px rgba(200, 0, 120, 0.45), 0 0 40px rgba(140, 0, 200, 0.2);
-      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-
-    #glLoginBtn:active,
-    #glFallbackBtn:active {
-      transform: scale(0.96);
-      box-shadow: 0 2px 12px rgba(200, 0, 120, 0.5);
-    }
-
-    #glLoginBtn:disabled,
-    #glFallbackBtn:disabled {
-      opacity: 0.55;
-      cursor: default;
-      pointer-events: none;
-    }
-
-    #glLoginError,
-    #glFallbackError {
-      font-size: clamp(12px, 2.5vw, 14px);
-      color: #ff6b9d;
-      text-align: center;
-      min-height: 0;
-      line-height: 1.65;
-      white-space: pre-line;   /* allows \n line-breaks in error messages */
-      transition: opacity 0.3s ease;
-      opacity: 0;
-      letter-spacing: 0.3px;
-    }
-
-    #glFallbackMsg {
-      font-size: clamp(12px, 2.6vw, 15px);
-      color: rgba(255, 210, 255, 0.6);
-      text-align: center;
-      line-height: 1.6;
-      margin: 0;
-    }
-
-    .gl-spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255, 255, 255, 0.25);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: glSpinner 0.65s linear infinite;
-      display: inline-block;
-      flex-shrink: 0;
-    }
-
     /* ── Game Loader ──────────────────────────────────────────────────────── */
     #gameLoader {
       position: fixed;
@@ -4059,31 +3883,9 @@
 </head>
 
 <body>
-  <!-- ── Invitation Login Screen ── -->
-  <div id="glLogin" aria-label="Invitation login">
-    <div id="glLoginCard">
-      <div id="glLoginTitle">✨ Welcome ✨</div>
-      <p id="glLoginSub">This journey was prepared for someone very special.</p>
-      <div id="glLoginMain">
-        <input id="glLoginInput" type="text" placeholder="Enter your invitation code"
-               autocomplete="off" autocorrect="off" autocapitalize="off"
-               spellcheck="false" inputmode="text" />
-        <button id="glLoginBtn">Begin Journey</button>
-        <div id="glLoginError"></div>
-      </div>
-      <div id="glLoginFallback" style="display:none">
-        <p id="glFallbackMsg">Unable to verify your invitation right now.<br>Please enter the default access code.</p>
-        <input id="glFallbackInput" type="text" placeholder="Default access code"
-               autocomplete="off" autocorrect="off" autocapitalize="off"
-               spellcheck="false" />
-        <button id="glFallbackBtn">Continue</button>
-        <div id="glFallbackError"></div>
-      </div>
-    </div>
-  </div>
   <!-- ── Game Loading Screen ── -->
   <div id="gameLoader" aria-label="Loading birthday adventure">
-    <div id="glTitle" style="font-family: Georgia, 'Times New Roman', Times, serif;">Happy Birthday!</div>
+    <!-- <div id="glTitle" style="font-family: Georgia, 'Times New Roman', Times, serif;">Loading Birthday Adventure…</div> -->
     <div id="glSub">Loading Birthday Adventure…</div>
     <div id="glBarWrap">
       <div id="glProgress"></div>
@@ -4189,7 +3991,7 @@
         </div>
 
         <div id="introTitle" style="font-family: Georgia, 'Times New Roman', Times, serif;">
-          Happy Birthday</div>
+          お誕生日おめでとう</div>
 
         <div class="intro-ribbon">
           <span></span>
@@ -4581,7 +4383,7 @@
         <div id="g4CandlesContainer" style="position:absolute;inset:0;z-index:6;"></div>
       </div>
       <div id="g4TapCount">Taps: 0 / 15</div>
-      <div id="g4TapHint">Tap each candle to make a wish</div>
+      <div id="g4TapHint">Tap candles to make a wish</div>
       <!-- Finale overlay -->
       <div id="g4Finale">
         <div id="g4FinaleText" style="font-family: Georgia, 'Times New Roman', Times, serif;">
@@ -4597,7 +4399,7 @@
           Have the most wonderful birthday! ❤️
         </div>
         <div>
-          <h1 style="font-family: Georgia, 'Times New Roman', Times, serif;color: #ffd500;">- From Spirit</h1>
+          <h6 style="font-family: Georgia, 'Times New Roman', Times, serif;color: #ffd500;">- From Spirit</h6>
         </div>
         <button id="g4ContinueBtn" aria-label="Continue to Final Chapter">Continue Journey ✨</button>
       </div>
@@ -4824,7 +4626,7 @@
       </div>
       <div id="fcEnding">
         <h2>Thanks for celebrating this birthday with us ❤️</h2>
-        <p>We hope this little adventure brought smiles, laughter, and unforgettable memories.</p>
+        <p>I hope this little adventure brought smiles, laughter, and unforgettable memories.</p>
         <p>Wishing you endless happiness, love, and wonderful moments ahead.</p>
         <p>Until the next adventure...</p>
         <button id="fcCloseJourneyBtn">Close Journey</button>
@@ -4898,8 +4700,7 @@
         session_id:   j.sessionId,
         completed:    true,
         completed_at: j.endedAt,
-        journey:      j,
-        access_code:  j.user ? j.user.access_code : null
+        journey:      j
       }).then(function (res) {
         if (!res.error) return true;
         /* 409 / unique-violation means this session was already successfully
@@ -4964,243 +4765,6 @@
 
     /* ─── End Journey Tracking infrastructure ──────────────────────────── */
 
-    /* ===================================================================
-       INVITATION LOGIN
-       Controls access to the game. Reuses the existing _supaClient.
-       Zero impact on journey tracking, game state, or preloading.
-       The preloader IIFE below starts immediately (background preload).
-       This IIFE wires the login UI and gates the game behind access code.
-       =================================================================== */
-
-    var currentUser = null;        /* populated on successful login, reset on reload */
-    var _loginCompleted = false;   /* used to keep journey.startedAt = login time    */
-
-    (function _initLoginScreen() {
-      /* localStorage keys */
-      var LS_CODE = 'anime_access_code';
-      var LS_NAME = 'anime_user_name';
-
-      var loginEl       = document.getElementById('glLogin');
-      var loginInput    = document.getElementById('glLoginInput');
-      var loginBtn      = document.getElementById('glLoginBtn');
-      var loginError    = document.getElementById('glLoginError');
-      var loginMain     = document.getElementById('glLoginMain');
-      var fallbackEl    = document.getElementById('glLoginFallback');
-      var fallbackInput = document.getElementById('glFallbackInput');
-      var fallbackBtn   = document.getElementById('glFallbackBtn');
-      var fallbackError = document.getElementById('glFallbackError');
-
-      /* Safety: if the element is missing for any reason, let the game through */
-      if (!loginEl) return;
-
-      /* ── UI helpers ─────────────────────────────────────────────────── */
-      function showMainError(msg) {
-        if (!loginError) return;
-        loginError.textContent = msg;
-        loginError.style.opacity = '1';
-      }
-      function clearMainError() {
-        if (!loginError) return;
-        loginError.style.opacity = '0';
-      }
-      function setMainLoading(on) {
-        if (loginBtn) {
-          loginBtn.disabled = on;
-          loginBtn.innerHTML = on
-            ? '<span class="gl-spinner"></span>Verifying…'
-            : 'Begin Journey';
-        }
-        if (loginInput) loginInput.disabled = on;
-      }
-
-      /* ── Reveal login screen (called if returning-user check fails) ── */
-      function showLoginScreen() {
-        loginEl.style.animation    = 'none';   /* CSS animation already cancelled */
-        loginEl.style.pointerEvents = '';
-        loginEl.style.opacity      = '1';      /* transition: opacity 0.9s eases in */
-        setTimeout(function () {
-          try { if (loginInput) loginInput.focus(); } catch (_e) {}
-        }, 300);
-      }
-
-      /* ── Called after ANY successful validation path ──────────────── */
-      function onLoginSuccess(user) {
-        currentUser = user;
-        _loginCompleted = true;
-        try {
-          journey.user = { id: user.id, name: user.name, access_code: user.access_code };
-          /* Pin journey.startedAt to login moment — this is the true game start */
-          journey.startedAt = new Date().toISOString();
-          saveJourney();
-        } catch (_le) { }
-
-        /* Fade out and remove the login screen */
-        loginEl.classList.add('gl-hide');
-        setTimeout(function () { loginEl.style.display = 'none'; }, 950);
-      }
-
-      /* ── Show network-failure fallback UI ─────────────────────────── */
-      function showNetworkFallback() {
-        if (loginMain)  loginMain.style.display  = 'none';
-        if (fallbackEl) fallbackEl.style.display = 'flex';
-        setTimeout(function () {
-          try { if (fallbackInput) fallbackInput.focus(); } catch (_e) {}
-        }, 120);
-      }
-
-      /* ── Mark user active in DB then store in localStorage ─────────
-         Called after code validated and is_logged_in === 'N'.
-         Fires the DB UPDATE, then calls onLoginSuccess regardless
-         of whether the update itself succeeded (best-effort).        */
-      function _activateAndLogin(user) {
-        var proceed = function () {
-          try {
-            localStorage.setItem(LS_CODE, user.access_code);
-            localStorage.setItem(LS_NAME, user.name || '');
-          } catch (_le) {}
-          onLoginSuccess(user);
-        };
-        if (!_supaClient) { proceed(); return; }
-        /* Use rpc() instead of update() — rpc sends POST, which is always
-           allowed by CORS. update() sends PATCH which some Supabase CORS
-           configurations block during the preflight OPTIONS request.
-           Requires the activate_user_login(p_access_code text) function
-           to exist in the database (see README / setup notes).          */
-        _supaClient
-          .rpc('activate_user_login', { p_access_code: user.access_code })
-          .then(function () { proceed(); })
-          .catch(function () { proceed(); });   /* never block on update failure */
-      }
-
-      /* ── Primary validation via Supabase game_users table ──────────── */
-      function doValidate() {
-        var code = (loginInput ? loginInput.value : '').trim();
-        if (!code) { showMainError('Please enter your invitation code.'); return; }
-        clearMainError();
-        setMainLoading(true);
-
-        /* If Supabase client never initialised, treat as network failure */
-        if (!_supaClient) {
-          setMainLoading(false);
-          showNetworkFallback();
-          return;
-        }
-
-        _supaClient
-          .from('game_users')
-          .select('id, name, access_code, is_logged_in')
-          .eq('access_code', code)
-          .maybeSingle()
-          .then(function (res) {
-            setMainLoading(false);
-            if (res.error) {
-              /* Hard Supabase/network error — show offline fallback */
-              showNetworkFallback();
-              return;
-            }
-            if (!res.data) {
-              /* Query succeeded but no row matched */
-              showMainError('Invalid access code.\nPlease check the code and try again.');
-              return;
-            }
-            if (res.data.is_logged_in === 'Y') {
-              /* is_logged_in is already 'Y'.  Check whether this is the
-                 same device by comparing the entered code to localStorage.
-                 If they match, the boot-time check must have failed (e.g.
-                 a transient network error) but this IS the original device
-                 — skip the error and proceed straight into the game.      */
-              var _localCode = null;
-              try { _localCode = localStorage.getItem(LS_CODE); } catch (_e) {}
-              if (_localCode === code) {
-                /* Same device — go directly into the game */
-                onLoginSuccess(res.data);
-                return;
-              }
-              /* Different device — deny */
-              showMainError(
-                'This access code is already active on another device.\n\n' +
-                'Please continue using the device where you originally logged in.\n\n' +
-                'If you need access on a new device, please contact the administrator.'
-              );
-              return;
-            }
-            /* is_logged_in === 'N' — first / fresh login, proceed */
-            _activateAndLogin(res.data);
-          })
-          .catch(function () {
-            setMainLoading(false);
-            showNetworkFallback();
-          });
-      }
-
-      /* ── Fallback validation: offline default code KAV001 ──────────── */
-      function doFallbackValidate() {
-        var code = (fallbackInput ? fallbackInput.value : '').trim();
-        if (code === 'KAV001') {
-          /* Offline fallback — no DB update, no localStorage write */
-          onLoginSuccess({ id: null, name: 'Guest', access_code: 'KAV001' });
-        } else {
-          if (fallbackError) fallbackError.textContent = 'Incorrect default access code.';
-        }
-      }
-
-      /* ── Event wiring ───────────────────────────────────────────────── */
-      if (loginBtn) loginBtn.addEventListener('click', doValidate);
-      if (loginInput) loginInput.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') doValidate();
-      });
-      if (fallbackBtn) fallbackBtn.addEventListener('click', doFallbackValidate);
-      if (fallbackInput) fallbackInput.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') doFallbackValidate();
-      });
-
-      /* ── Returning-user check — runs on every page load ─────────────
-         Reads anime_access_code from localStorage.  If present, verifies
-         against the DB.  If is_logged_in='Y' → same device → skip login.
-         If stale/reset by admin → clear storage → show login screen.
-         The login screen is held at opacity:0 during the async check so
-         returning users never see a flash of the login UI.             */
-      var _storedCode = null;
-      try { _storedCode = localStorage.getItem(LS_CODE); } catch (_e) {}
-
-      if (_storedCode && _supaClient) {
-        /* Freeze login screen before CSS fade-in animation plays */
-        loginEl.style.animation    = 'none';
-        loginEl.style.opacity      = '0';
-        loginEl.style.pointerEvents = 'none';
-
-        _supaClient
-          .from('game_users')
-          .select('id, name, access_code, is_logged_in')
-          .eq('access_code', _storedCode)
-          .maybeSingle()
-          .then(function (res) {
-            if (!res.error && res.data && res.data.is_logged_in === 'Y') {
-              /* Same device confirmed — go straight into the game */
-              onLoginSuccess(res.data);
-            } else {
-              /* DB returned 'N', no row, or query error.
-                 Per spec: NEVER clear localStorage automatically.
-                 Show the login screen — doValidate will handle re-auth. */
-              showLoginScreen();
-            }
-          })
-          .catch(function () {
-            /* Network failure during boot check — preserve localStorage,
-               show login screen so user can proceed manually.            */
-            showLoginScreen();
-          });
-
-      } else {
-        /* No stored code (or no Supabase) — CSS animation shows login normally */
-        setTimeout(function () {
-          try { if (loginInput) loginInput.focus(); } catch (_e) {}
-        }, 400);
-      }
-    })();
-
-    /* ─── End Invitation Login ──────────────────────────────────────────── */
-
     /* ── Game asset preloader — runs immediately, hides loader when ready ── */
     (function () {
       var ASSETS = [
@@ -5229,11 +4793,9 @@
         if (!loader) return;
         loader.classList.add('gl-hide');
         setTimeout(function () { loader.style.display = 'none'; }, 950);
-        /* Journey: capture game-start timestamp and device fingerprint.
-           Only set startedAt if login has not already pinned it to login
-           time — onLoginSuccess always stamps it, so we must not overwrite. */
+        /* Journey: capture game-start timestamp and device fingerprint */
         try {
-          if (!journey.startedAt) { journey.startedAt = new Date().toISOString(); }
+          journey.startedAt = new Date().toISOString();
           journey.device = {
             browser:      navigator.userAgent || '',
             platform:     (navigator.userAgentData
@@ -5468,72 +5030,151 @@
 
     //     ];
 
-    const LEVELS = [
-      {
-        name: "Northern Light",
-        x: 430, y: 1120,
-        theme: "aurora",
-        bg: "northernlight.webp",
-        intro: `Hey, birthday girl. I'm Spirit!.
+//     const LEVELS = [
+//       {
+//         name: "Northern Light",
+//         x: 430, y: 1120,
+//         theme: "aurora",
+//         bg: "northernlight.webp",
+//         intro: `Hey, birthday girl. I'm Spirit!.
 
-I've been waiting for you.
+// I've been waiting for you.
 
-There are a few little moments I'd like to share with you today.
+// There are a few little moments I'd like to share with you today.
 
-Shall we begin?`,
-        done: `See?
+// Shall we begin?`,
+//         done: `See?
 
-The journey always feels brighter when you're in it.
+// The journey always feels brighter when you're in it.
+
+// Let's keep going.`
+//       },
+
+//       {
+//         name: "Switzerland",
+//         x: 880, y: 760,
+//         theme: "swiss",
+//         bg: "swiss.webp",
+//         intro: `A place as beautiful as this...
+
+// Still has competition today.
+
+// Ready to see why?`,
+//         done: `Beautiful.
+
+// Though somehow, you still manage to outshine the view.
+
+// Let's continue.`
+//       },
+
+//       {
+//         name: "Japan",
+//         x: 1340, y: 1080,
+//         theme: "japan",
+//         bg: "japan.webp",
+//         intro: `Soft blossoms.
+// Quiet skies.
+
+// This place reminded me of someone.
+
+// You.`,
+//         done: `Every step with you feels a little special.
+
+// Let's see what's next.`
+//       },
+
+//       {
+//         name: "Surprise",
+//         x: 1830, y: 640,
+//         theme: "surprise",
+//         bg: "surprise.webp",
+//         intro: `We're almost there.
+
+// But I still have one more surprise waiting for you.`,
+//         done: `Perfect.
+
+// Now it's time for the part everyone has been waiting for.`
+//       }
+//     ];
+
+const LEVELS = [
+  {
+    name: "Northern Light",
+    x: 430, y: 1120,
+    theme: "aurora",
+    bg: "northernlight.webp",
+    intro: `Happy Birthday, beautiful. 💙
+
+I'm Spirit, your little guide for today's adventure.
+Each place hides a small memory, surprise, or message made just for you.
+
+Complete the challenge, collect the stars, and let me show you why today is all about you.
+
+Ready to begin?`,
+    done: `You did it!
+
+See? Every little step with you makes the journey feel brighter.
+And trust me... we're only getting started.`
+  },
+
+  {
+    name: "Switzerland",
+    x: 880, y: 760,
+    theme: "swiss",
+    bg: "swiss.webp",
+    intro: `Welcome to Switzerland.
+
+People travel across the world to admire views like these...
+Yet somehow, today they're competing with your smile.
+
+Finish this level and let's see if the mountains can keep up.`,
+    done: `Another challenge cleared.
+
+The scenery is breathtaking...
+but somehow, you still steal all the attention.
 
 Let's keep going.`
-      },
+  },
 
-      {
-        name: "Switzerland",
-        x: 880, y: 760,
-        theme: "swiss",
-        bg: "swiss.webp",
-        intro: `A place as beautiful as this...
+  {
+    name: "Japan",
+    x: 1340, y: 1080,
+    theme: "japan",
+    bg: "japan.webp",
+    intro: `Cherry blossoms bloom for only a short while,
+which is what makes them so special.
 
-Still has competition today.
+You remind me of them—
+gentle, beautiful, and someone worth slowing down for.
 
-Ready to see why?`,
-        done: `Beautiful.
+Let's make another memory together.`,
+    done: `Perfect.
 
-Though somehow, you still manage to outshine the view.
+Just like these blossoms,
+every moment with you becomes a memory worth keeping.
 
-Let's continue.`
-      },
+On to the next surprise.`
+  },
 
-      {
-        name: "Japan",
-        x: 1340, y: 1080,
-        theme: "japan",
-        bg: "japan.webp",
-        intro: `Soft blossoms.
-Quiet skies.
+  {
+    name: "Surprise",
+    x: 1830, y: 640,
+    theme: "surprise",
+    bg: "surprise.webp",
+    intro: `You've come this far...
 
-This place reminded me of someone.
+There's just one final challenge between you and the birthday surprise I've been hiding.
 
-You.`,
-        done: `Every step with you feels a little special.
+I promise it'll be worth it.`,
+    done: `Congratulations!
 
-Let's see what's next.`
-      },
+You completed every challenge.
+Now it's time to open the final surprise...
 
-      {
-        name: "Surprise",
-        x: 1830, y: 640,
-        theme: "surprise",
-        bg: "surprise.webp",
-        intro: `We're almost there.
+And I hope it makes you smile. ❤️`
+  }
+];
 
-But I still have one more surprise waiting for you.`,
-        done: `Perfect.
-
-Now it's time for the part everyone has been waiting for.`
-      }
-    ];
     const charOffsetY = -95; // bigger avatar, sitting a bit lower on each level image
 
     /* ---------- THEMED SCENE SVGs ---------- */
@@ -6519,7 +6160,7 @@ Now it's time for the part everyone has been waiting for.`
       },
       2: {
         icon: HOWTO_ICONS[2], title: 'Ramen Kitchen',
-        text: '<b>Slide the bowl</b> left &amp; right to catch the falling ingredients. Collect <b>all 9 ingredients</b> — noodles, pork, egg, onion, naruto, nori, bamboo, corn &amp; mushroom — to cook the perfect bowl!',
+        text: '<b>Slide the bowl</b> left &amp; right to catch the falling ingredients. Collect <b>all 9 ingredients</b> — noodles, pork, egg, onion, nori, bamboo, corn &amp; mushroom — to cook the perfect bowl!',
         start: () => openGame3()
       },
       3: {
@@ -6908,7 +6549,7 @@ Now it's time for the part everyone has been waiting for.`
       try { journey._lv1Start = Date.now(); } catch (_je) { }
       g1.el.classList.add('show');
       g1.running = true; g1.last = performance.now();
-
+      startMasterLoop();   // drive updateGame1 from the shared loop
     }
     function spawnItem() {
       let type;
@@ -7053,6 +6694,15 @@ Now it's time for the part everyone has been waiting for.`
       /* Award exactly the hearts the player collected during gameplay */
       window.fcHearts = (window.fcHearts || 0) + g1.hearts;
       g1.el.classList.remove('show');
+      /* Remove Level 1 decorative nodes (aurora bands, snow, stars) — they all carry
+         infinite CSS animations that continue consuming GPU even when the level is
+         hidden.  g1BuildAurora() and g1MakeStars() recreate them fresh on next open. */
+      try {
+        var _g1aurora = document.getElementById('g1aurora');
+        if (_g1aurora) _g1aurora.innerHTML = '';
+        var _g1stars = document.getElementById('g1stars');
+        if (_g1stars) _g1stars.innerHTML = '';
+      } catch (_je) { }
       completeCurrent();
     }
 
@@ -7355,6 +7005,7 @@ Now it's time for the part everyone has been waiting for.`
       /* Pause decorative background animations — invisible under game2, no need to run */
       G2_DECOR_ELS.forEach(function (el) { el.style.animationPlayState = 'paused'; });
       g2.running = true; g2.last = performance.now();
+      startMasterLoop();   // drive updateGame2 from the shared loop
     }
     /* Compute JS recoil Y offset and apply full transform in one write */
     function updateCannonTransform() {
@@ -7779,6 +7430,7 @@ Now it's time for the part everyone has been waiting for.`
       window.addEventListener('keydown', g3Key);
 
       g3.running = true; g3.last = performance.now();
+      startMasterLoop();   // drive updateGame3 from the shared loop
 
       // Spawn the first ingredient immediately
       spawnIngredient();
@@ -8657,10 +8309,25 @@ Now it's time for the part everyone has been waiting for.`
       sparkPool.push({ active: false });
     }
 
+    // PHASE 1: Master Loop — event-driven: sleeps when idle, wakes on demand
+    let masterLoopRunning = false;
+    let isPausedByVisibility = false;
+    let activeParticleCount = 0;   // live canvas-particle count across all four pools
+
+    /* startMasterLoop — idempotent kick; safe to call at any time */
+    function startMasterLoop() {
+      if (!masterLoopRunning && !isPausedByVisibility) {
+        masterLoopRunning = true;
+        requestAnimationFrame(masterLoop);
+      }
+    }
+
     function spawnParticle(pool, opts) {
       for (let i = 0; i < pool.length; i++) {
         if (!pool[i].active) {
           Object.assign(pool[i], opts, { active: true });
+          activeParticleCount++;      // one more live particle
+          startMasterLoop();          // wake the loop if it went idle
           return;
         }
       }
@@ -8676,6 +8343,7 @@ Now it's time for the part everyone has been waiting for.`
           p.life -= p.lifeDecay;
           if (p.life <= 0) {
             p.active = false;
+            activeParticleCount--;   // one fewer live particle
             continue;
           }
           fxCtx.globalAlpha = p.life;
@@ -8685,20 +8353,13 @@ Now it's time for the part everyone has been waiting for.`
       }
     }
 
-    // PHASE 1: Master Loop
-    let masterLoopRunning = false;
-    let isPausedByVisibility = false;
-
     // PHASE 15: Visibility API
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
         isPausedByVisibility = true;
       } else {
         isPausedByVisibility = false;
-        if (!masterLoopRunning) {
-          masterLoopRunning = true;
-          requestAnimationFrame(masterLoop);
-        }
+        startMasterLoop();   // restart only if there is work pending
       }
     });
 
@@ -8708,6 +8369,10 @@ Now it's time for the part everyone has been waiting for.`
         return;
       }
       masterLoopRunning = true;
+
+      const _anyGameRunning = (typeof g1 !== 'undefined' && g1.running) ||
+                              (typeof g2 !== 'undefined' && g2.running) ||
+                              (typeof g3 !== 'undefined' && g3.running);
 
       if (fxCtx) {
         fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
@@ -8724,11 +8389,14 @@ Now it's time for the part everyone has been waiting for.`
       updateParticles(confettiPool, now);
       updateParticles(sparkPool, now);
 
-      requestAnimationFrame(masterLoop);
+      // Reschedule only while there is visible work to do; stop when idle
+      if (activeParticleCount > 0 || _anyGameRunning) {
+        requestAnimationFrame(masterLoop);
+      } else {
+        masterLoopRunning = false;
+      }
     }
-
-    // Start master loop
-    requestAnimationFrame(masterLoop);
+    // No auto-start — loop is kicked by startMasterLoop() when work arrives
 
     /* =====================================================================
        BIRTHDAY PARTY FINALE — 17-Phase Living Party Sequence
@@ -9770,11 +9438,11 @@ Now it's time for the part everyone has been waiting for.`
           await fcDelay(700);
 
           await fcSwapCharImg(fcImgDS, 'demonslayerwelcome.webp');
-          await fcLine('Demon Slayer', FC_COL.ds, "You're so beautiful that we don't even know what to say... It's making us too shy to come out..., Happy Birthday Kavyaa... We really mean it.", 'ds_reveal_1');
+          await fcLine('Demon Slayer', FC_COL.ds, "Hi Kavyaa, You're so beautiful that we don't even know what to say... It's making us too shy to come out..., Happy Birthday Kavyaa...", 'ds_reveal_1');
 
           await fcSwapCharImg(fcImgDS, 'demonslayerheart.webp');
           fcFloatHearts(5);
-          await fcLine('Demon Slayer', FC_COL.ds, "We're sending all our love to the birthday girl!", 'ds_reveal_2');
+          await fcLine('Demon Slayer', FC_COL.ds, "We're sending all our love to you Kavyaa!", 'ds_reveal_2');
 
           /* Heart pop — DS (3 hearts) */
           var _hp4ShownAt = new Date().toISOString();
@@ -10343,10 +10011,11 @@ Now it's time for the part everyone has been waiting for.`
             "You have a kind heart, a gentle soul, and the rare ability to care deeply for the people and the world around you. That's something I truly admire.<br><br>" +
             "I hope you never lose that beautiful empathy, even though it means you feel things more deeply than most.<br><br>" +
             "And I hope there are countless moments this year that make <span style='color:gold; font-weight:bold;'>'Evergreen'</span> play in your mind—not because you're holding onto memories, but because you're creating new ones that make you smile.<br><br>" +
-            "I'd really love to know you better. I know we've only had few conversations, and there's so much more about you I'd love to discover—your stories, your favorite things, and what makes you smile.<br><br>" +
+            // "I'd really love to know you better. I know we've only had few conversations, and there's so much more about you I'd love to discover—your stories, your favorite things, and what makes you smile.<br><br>" +
             "May this birthday bring you peace, laughter, unforgettable adventures, and every happiness you deserve. Keep smiling, keep being yourself.<br><br>" +
-            "Happy Birthday, Kavyaa. Wishing you a year as beautiful and genuine as your heart. ❤️<br><br>" +
-            "<span style='font-weight:bold; color:gold;'>— The Creator</span>";
+            "Be bold. Be brave. And always stay <span style='color:gold; font-weight:bold; text-shadow:0 0 8px gold, 0 0 15px #ffd700;'>明るい</span>.<br><br>" +
+            "Happy Birthday, Kavyaa. Wishing you a year as beautiful and genuine as you. ❤️<br><br>" +
+            "<span style='font-weight:bold; color:gold;'>— From the creator of this little surprise.</span>";
 
 
           fcCreator.classList.add('fc-show');
